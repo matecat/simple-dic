@@ -1,6 +1,6 @@
 # Simple DIC
 
-**Simple DIC** is a simple Dependency Injection Container(DIC) built on top of Pimple.
+**Simple DIC** is a simple Dependency Injection Container(DIC) built on top of [Pimple](https://github.com/silexphp/Pimple).
 
 ## Basic Usage
 
