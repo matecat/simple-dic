@@ -16,13 +16,35 @@ DIC::init($config);
 
 ## Configuring DIC
 
-To init 
+To init DIC you have to furnish an array of dependencies. Here is a sample (in YAML format):
 
+```yaml
+dummy-key: 'dummy-value'
+dummy-array: [43243,2432,4324,445667]
+three: 3
+two: 2
+acme:
+  class: SimpleDIC\Dummy\Acme
+acme-calculator:
+  class: SimpleDIC\Dummy\AcmeCalculator
+  method: init
+  method_arguments: ['@three', '@two']
+acme-parser:
+  class: SimpleDIC\Dummy\AcmeParser
+  arguments: ['string']
+acme-repo:
+  class: SimpleDIC\Dummy\AcmeRepo
+  arguments: ['@acme']
+```
 
+After pass the name of dependency, you can specify:
 
-For further config details please refer to the official documentation:
+* `class` : the full qualified class name 
+* `arguments`: an array of arguments to pass to instantiate the class
+* `method`: if you want to start a specific method of the class
+* `method_arguments`: an array of arguments to pass to instantiate the runned class method
 
-[Configuration for the AWS SDK for PHP Version 3](https://docs.aws.amazon.com/en_us/sdk-for-php/v3/developer-guide/guide_configuration.html#credentials)
+If you want to pass an entry already present to other one, simply use the '@' symbol.
 
 ## Retrive an entry
 
