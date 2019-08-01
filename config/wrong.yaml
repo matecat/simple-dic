@@ -1,0 +1,6 @@
+acme-calculator:
+  class: SimpleDIC\Dummy\AcmeCalculator
+  method: init
+acme-repo:
+  class: SimpleDIC\Dummy\AcmeRepo
+  arguments: ['@acme']
