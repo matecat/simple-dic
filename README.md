@@ -56,7 +56,7 @@ use SimpleDIC\DIC;
 $dependency = DIC::get('key');
 ```
 
-// The method returns:
+Please note that the method returns:
 * `false` if the entry has a wrong configuration;
 * `NULL` if the entry does not exists.
 
@@ -78,7 +78,7 @@ set_time_limit(0);
 use Symfony\Component\Yaml\Yaml;
 
 // create symfony console app
-$app = new \Symfony\Component\Console\Application('Simple S3', 'console tool');
+$app = new \Symfony\Component\Console\Application('Simple DIC', 'console tool');
 
 // config
 $config = Yaml::parseFile(__DIR__.'/../config/config.yaml');

@@ -6,7 +6,7 @@ require __DIR__.'/../vendor/autoload.php';
 use Symfony\Component\Yaml\Yaml;
 
 // create symfony console app
-$app = new \Symfony\Component\Console\Application('Simple S3', 'console tool');
+$app = new \Symfony\Component\Console\Application('Simple DIC', 'console tool');
 
 // config
 $config = Yaml::parseFile(__DIR__.'/../config/config.yaml');
