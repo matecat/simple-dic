@@ -105,7 +105,7 @@ class DIC
     public static function set($key, $content)
     {
         if (false === self::has($key)) {
-            self::$container[$key] = function ($c) use ($content) {
+            self::$container[$key] = function($c) use ($content) {
 
                 // if is not a class set the entry value in DIC
                 if (false === isset($content['class'])) {
@@ -124,7 +124,7 @@ class DIC
                     // if specified, call the method with provided arguments
                     if ($methodArguments) {
                         try {
-                            return call_user_func_array([ $class, $method ], self::getArgumentsToInject($c, $methodArguments));
+                            return call_user_func_array([$class, $method], self::getArgumentsToInject($c, $methodArguments));
                         } catch (\Error $error) {
                             return false;
                         } catch (\Exception $exception) {

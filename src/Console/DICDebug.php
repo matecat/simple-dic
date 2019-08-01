@@ -40,7 +40,7 @@ class DICDebug extends Command
         asort($keys);
 
         $table = new Table($output);
-        $table->setHeaders(['#','Entry', 'Type', 'Content']);
+        $table->setHeaders(['#', 'Entry', 'Type', 'Content']);
 
         $i = 1;
         foreach ($keys as $key) {
@@ -75,13 +75,13 @@ class DICDebug extends Command
         }
 
         if (is_object($dicKey)) {
-            return '<fg=cyan>'. get_class($dicKey) . '</>';
+            return '<fg=cyan>' . get_class($dicKey) . '</>';
         }
 
         if (is_array($dicKey)) {
-            return '<fg=green>'. implode("|", $dicKey) . '</>';
+            return '<fg=green>' . implode("|", $dicKey) . '</>';
         }
 
-        return '<fg=yellow>'. $dicKey . '</>';
+        return '<fg=yellow>' . $dicKey . '</>';
     }
 }

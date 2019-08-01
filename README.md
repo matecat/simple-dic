@@ -1,5 +1,10 @@
 # Simple DIC
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5bee3c5a5e774e5aba1fcf9f622f08d2)](https://www.codacy.com/app/mauretto78_2/simple-dic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mauretto78/simple-dic&amp;utm_campaign=Badge_Grade)
+[![license](https://img.shields.io/github/license/mauretto78/simple-dic.svg)]()
+[![Packagist](https://img.shields.io/packagist/v/mauretto78/simple-dic.svg)]()
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mauretto78/simple-dic/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mauretto78/simple-dic/?branch=master)
+
 **Simple DIC** is a simple Dependency Injection Container(DIC) built on top of [Pimple](https://github.com/silexphp/Pimple).
 
 ## Basic Usage
