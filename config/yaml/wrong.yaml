@@ -4,3 +4,5 @@ acme-calculator:
 acme-repo:
   class: SimpleDIC\Dummy\AcmeRepo
   arguments: ['@acme']
+not-existing:
+  class: SimpleDIC\Dummy\NotExistintClass

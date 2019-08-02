@@ -9,7 +9,7 @@ use Symfony\Component\Yaml\Yaml;
 $app = new \Symfony\Component\Console\Application('Simple DIC', 'console tool');
 
 // config
-$config = Yaml::parseFile(__DIR__.'/../config/config.yaml');
+$config = Yaml::parseFile(__DIR__.'/../config/yaml/config.yaml');
 
 // add commands here
 $app->add(new \SimpleDIC\Console\DICDebug($config));

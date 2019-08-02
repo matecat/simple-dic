@@ -38,6 +38,7 @@ class DICTest extends TestCase
 
         $this->assertFalse($dic::get('acme-repo'));
         $this->assertFalse($dic::get('acme-calculator'));
+        $this->assertFalse($dic::get('not-existing'));
     }
 
     /**
@@ -48,9 +49,11 @@ class DICTest extends TestCase
         $config = Yaml::parseFile(__DIR__ . '/../config/yaml/config.yaml');
         $dic = DIC::init($config);
 
-        // 1) simple entry
+        // 1) simple entries
         $this->assertTrue($dic::has('dummy-key'));
+        $this->assertTrue($dic::has('dummy-array'));
         $this->assertEquals($dic::get('dummy-key'), 'dummy-value');
+        $this->assertEquals($dic::get('dummy-array'), [43243,2432,4324,445667]);
 
         // 2) simple class
         $this->assertTrue($dic::has('acme'));

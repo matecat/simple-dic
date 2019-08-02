@@ -154,6 +154,10 @@ class DIC
                     }
                 }
 
+                if(false === class_exists($class)){
+                    return false;
+                }
+
                 // if the method is not specified, call the constructor
                 try {
                     return new $class(...self::getArgumentsToInject($c, $classArguments));
@@ -211,8 +215,12 @@ class DIC
      */
     private static function getFromDICParams($parameter)
     {
-        $key = trim($parameter, '%');
+        if(is_string($parameter)){
+            $key = trim($parameter, '%');
 
-        return (DICParams::has($key)) ? DICParams::get($key) : $key;
+            return (DICParams::has($key)) ? DICParams::get($key) : $parameter;
+        }
+
+        return $parameter;
     }
 }
