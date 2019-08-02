@@ -133,7 +133,7 @@ class DICTest extends TestCase
     /**
      * @test
      */
-    public function init_with_parameters()
+    public function init_after_DICParams()
     {
         DICParams::initFromFile(__DIR__.'/../config/ini/parameters.ini');
         $dic = DIC::initFromFile(__DIR__ . '/../config/ini/client.ini');
@@ -141,5 +141,19 @@ class DICTest extends TestCase
         $this->assertTrue($dic::has('client'));
         $this->assertInstanceOf(Client::class, $dic::get('client'));
         $this->assertEquals('mauretto78', $dic::get('client')->getUsername());
+    }
+
+    /**
+     * @test
+     */
+    public function init_with_env_variables()
+    {
+        putenv("FOO=bar");
+
+        $dic = DIC::initFromFile(__DIR__ . '/../config/ini/logger.ini');
+
+        $this->assertTrue($dic::has('logger'));
+        $this->assertInstanceOf(Logger::class, $dic::get('logger'));
+        $this->assertEquals('bar', $dic::get('logger')->getFoo());
     }
 }

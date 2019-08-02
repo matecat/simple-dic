@@ -81,6 +81,16 @@ client:
     arguments: ['%your_secret_token%', '%your_secret_password%']
 ```
 
+## Environment Variable Support
+
+To use your environment variable, simply follow the `%env(xxxx)%` synthax, consider this example:
+
+```yaml
+logger:
+    class: 'SimpleDIC\Dummy\Logger'
+    arguments: ['%env(FOO)%']
+```
+
 ## Retrive an entry
 
 In order to retrieve an entry simple do this:

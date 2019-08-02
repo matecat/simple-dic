@@ -121,7 +121,7 @@ class DIC
 
                 // if is not a class set the entry value in DIC
                 if (false === isset($content['class'])) {
-                    return self::getFromDICParams($content);
+                    return self::getFromEnvOrDICParams($content);
                 }
 
                 // otherwise it's a class, so extract variables
@@ -154,7 +154,7 @@ class DIC
                     }
                 }
 
-                if(false === class_exists($class)){
+                if (false === class_exists($class)) {
                     return false;
                 }
 
@@ -205,7 +205,7 @@ class DIC
             return $c[ltrim($argument, '@')];
         }
 
-        return self::getFromDICParams($argument);
+        return self::getFromEnvOrDICParams($argument);
     }
 
     /**
@@ -213,14 +213,40 @@ class DIC
      *
      * @return mixed|string|null
      */
-    private static function getFromDICParams($parameter)
+    private static function getFromEnvOrDICParams($parameter)
     {
-        if(is_string($parameter)){
-            $key = trim($parameter, '%');
+        if (is_string($parameter)) {
+            if (null !== self::getEnvKey($parameter)) {
+                return (getenv(self::getEnvKey($parameter))) ? getenv(self::getEnvKey($parameter)) : $parameter;
+            }
 
-            return (DICParams::has($key)) ? DICParams::get($key) : $parameter;
+            return (DICParams::has(self::getParamKey($parameter))) ? DICParams::get(self::getParamKey($parameter)) : $parameter;
         }
 
         return $parameter;
+    }
+
+    /**
+     * Extract from a string like %env(FOO)%
+     *
+     * @param string $string
+     *
+     * @return mixed|null
+     */
+    private static function getEnvKey($string)
+    {
+        preg_match('~%env\((.*?)\)%~', $string, $matches);
+
+        return (count($matches) > 0) ? $matches[1] : null;
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    private static function getParamKey($string)
+    {
+        return trim($string, '%');
     }
 }
