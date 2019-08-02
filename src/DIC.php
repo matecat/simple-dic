@@ -52,9 +52,7 @@ class DIC
      */
     public static function initFromFile($filename)
     {
-        $config = Parser::parse($filename);
-
-        return new self($config);
+        return new self(Parser::parse($filename));
     }
 
     /**
@@ -123,7 +121,7 @@ class DIC
 
                 // if is not a class set the entry value in DIC
                 if (false === isset($content['class'])) {
-                    return $content;
+                    return self::getFromDICParams($content);
                 }
 
                 // otherwise it's a class, so extract variables
@@ -184,14 +182,37 @@ class DIC
 
         if (null != $providedArguments) {
             foreach ($providedArguments as $argument) {
-                if (isset($c[ltrim($argument, '@')])) {
-                    $returnArguments[] = $c[ltrim($argument, '@')];
-                } else {
-                    $returnArguments[] = $argument;
-                }
+                $returnArguments[] = self::getArgumentToInject($argument, $c);
             }
         }
 
         return $returnArguments;
+    }
+
+    /**
+     * @param   string        $argument
+     * @param Container $c
+     *
+     * @return mixed|string|null
+     */
+    private static function getArgumentToInject($argument, Container $c)
+    {
+        if (isset($c[ltrim($argument, '@')])) {
+            return $c[ltrim($argument, '@')];
+        }
+
+        return self::getFromDICParams($argument);
+    }
+
+    /**
+     * @param string $parameter
+     *
+     * @return mixed|string|null
+     */
+    private static function getFromDICParams($parameter)
+    {
+        $key = trim($parameter, '%');
+
+        return (DICParams::has($key)) ? DICParams::get($key) : $key;
     }
 }

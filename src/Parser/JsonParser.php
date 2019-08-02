@@ -7,7 +7,7 @@ class JsonParser implements ParserInterface
     /**
      * @param string $filename
      *
-     * @return array
+     * @return array|false
      * @throws \Exception
      */
     public function parse($filename)

@@ -55,6 +55,24 @@ After pass the name of dependency, you can specify:
 
 If you want to pass an entry already present to other one, simply use the '@' symbol.
 
+## Parameters
+
+If you want to use a separate parameters file, you can use `DICParams` class. You MUST set parameters **before** instantiate DIC. Take a look at the following example of params configuration file
+ (YAML format):
+
+```yaml
+your_secret_token: 'YOUR_SECRET_TOKEN'
+your_secret_password: 'YOUR_SECRET_PASS'
+```
+
+And then, you can use '%' synthax in your DIC configuration file:
+
+```yaml
+client:
+    class: 'SimpleDIC\Dummy\Client'
+    arguments: ['%your_secret_token%', '%your_secret_password%']
+```
+
 ## Retrive an entry
 
 In order to retrieve an entry simple do this:

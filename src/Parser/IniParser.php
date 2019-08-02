@@ -7,7 +7,7 @@ class IniParser implements ParserInterface
     /**
      * @param string $filename
      *
-     * @return array
+     * @return array|false
      */
     public function parse($filename)
     {

@@ -31,7 +31,7 @@ class Parser
     /**
      * @param string $filename
      *
-     * @return mixed
+     * @return string
      */
     private static function getExt($filename)
     {

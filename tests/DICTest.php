@@ -4,10 +4,12 @@ namespace SimpleDIC\Tests;
 
 use PHPUnit\Framework\TestCase;
 use SimpleDIC\DIC;
+use SimpleDIC\DICParams;
 use SimpleDIC\Dummy\Acme;
 use SimpleDIC\Dummy\AcmeCalculator;
 use SimpleDIC\Dummy\AcmeParser;
 use SimpleDIC\Dummy\AcmeRepo;
+use SimpleDIC\Dummy\Client;
 use SimpleDIC\Dummy\Controller;
 use SimpleDIC\Dummy\Database;
 use SimpleDIC\Dummy\Logger;
@@ -41,7 +43,7 @@ class DICTest extends TestCase
     /**
      * @test
      */
-    public function return_entries()
+    public function init()
     {
         $config = Yaml::parseFile(__DIR__ . '/../config/yaml/config.yaml');
         $dic = DIC::init($config);
@@ -85,18 +87,6 @@ class DICTest extends TestCase
     /**
      * @test
      */
-    public function return_entriesfdsfsdfds()
-    {
-        $config = Yaml::parseFile(__DIR__ . '/../config/yaml/database.yaml');
-        $dic = DIC::init($config);
-
-        $this->assertTrue($dic::has('db'));
-        $this->assertInstanceOf(Database::class, $dic::get('db'));
-    }
-
-    /**
-     * @test
-     */
     public function init_from_file_exception()
     {
         try {
@@ -135,5 +125,18 @@ class DICTest extends TestCase
 
         $this->assertTrue($dic::has('db'));
         $this->assertInstanceOf(Database::class, $dic::get('db'));
+    }
+
+    /**
+     * @test
+     */
+    public function init_with_parameters()
+    {
+        DICParams::initFromFile(__DIR__.'/../config/ini/parameters.ini');
+        $dic = DIC::initFromFile(__DIR__ . '/../config/ini/client.ini');
+
+        $this->assertTrue($dic::has('client'));
+        $this->assertInstanceOf(Client::class, $dic::get('client'));
+        $this->assertEquals('mauretto78', $dic::get('client')->getUsername());
     }
 }
