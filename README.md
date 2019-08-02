@@ -91,7 +91,7 @@ logger:
     arguments: ['%env(FOO)%']
 ```
 
-## Retrive an entry
+## Retrieve an entry
 
 In order to retrieve an entry simple do this:
 
