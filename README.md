@@ -57,7 +57,7 @@ If you want to pass an entry already present to other one, simply use the '@' sy
 
 ## Parameters
 
-If you want to use a separate parameters file, you can use `DICParams` class. You MUST set parameters **before** instantiate DIC. Take a look at the following example of params configuration file
+If you want to use a separate parameters file, you can use `DICParams` class. Take a look at the following example of params configuration file
  (YAML format):
 
 ```yaml
@@ -65,7 +65,15 @@ your_secret_token: 'YOUR_SECRET_TOKEN'
 your_secret_password: 'YOUR_SECRET_PASS'
 ```
 
-And then, you can use '%' synthax in your DIC configuration file:
+You can setup `DICParams` class now:
+
+```php
+use SimpleDIC\DICParams;
+
+DICParams::initFromFile('your_params_file.yaml');
+```
+
+And then, you can use '%' synthax in your DIC configuration file. Please bear in mind that you MUST set parameters **before** instantiate DIC. 
 
 ```yaml
 client:
