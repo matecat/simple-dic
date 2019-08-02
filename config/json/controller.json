@@ -1,0 +1,6 @@
+{
+  "controller":  {
+    "class": "SimpleDIC\\Dummy\\Controller",
+    "arguments": ["Dummy-Controller"]
+  }
+}

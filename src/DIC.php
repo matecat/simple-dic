@@ -3,6 +3,7 @@
 namespace SimpleDIC;
 
 use Pimple\Container;
+use SimpleDIC\Parser\Parser;
 
 class DIC
 {
@@ -40,6 +41,19 @@ class DIC
      */
     public static function init(array $config = [])
     {
+        return new self($config);
+    }
+
+    /**
+     * @param string $filename
+     *
+     * @return DIC
+     * @throws \Exception
+     */
+    public static function initFromFile($filename)
+    {
+        $config = Parser::parse($filename);
+
         return new self($config);
     }
 
@@ -105,7 +119,7 @@ class DIC
     public static function set($key, $content)
     {
         if (false === self::has($key)) {
-            self::$container[$key] = function($c) use ($content) {
+            self::$container[$key] = function ($c) use ($content) {
 
                 // if is not a class set the entry value in DIC
                 if (false === isset($content['class'])) {

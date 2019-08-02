@@ -40,7 +40,7 @@ class DICDebug extends Command
         asort($keys);
 
         $table = new Table($output);
-        $table->setHeaders(['#', 'Entry', 'Type', 'Content']);
+        $table->setHeaders(['#', 'Alias', 'Type', 'Content']);
 
         $i = 1;
         foreach ($keys as $key) {

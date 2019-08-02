@@ -21,7 +21,11 @@ DIC::init($config);
 
 ## Configuring DIC
 
-To init DIC you have to furnish an array of dependencies. Here is a sample (in YAML format):
+To init DIC you have to furnish an array of dependencies. 
+
+For your convenience you can use `initFromFile` method to parse the configuration from a file (ini, json, xml and yaml extension are supported).
+
+Here is a sample (in YAML format):
 
 ```yaml
 dummy-key: 'dummy-value'

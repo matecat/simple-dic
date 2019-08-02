@@ -8,7 +8,10 @@ use SimpleDIC\Dummy\Acme;
 use SimpleDIC\Dummy\AcmeCalculator;
 use SimpleDIC\Dummy\AcmeParser;
 use SimpleDIC\Dummy\AcmeRepo;
+use SimpleDIC\Dummy\Controller;
 use SimpleDIC\Dummy\Database;
+use SimpleDIC\Dummy\Logger;
+use SimpleDIC\Dummy\Router;
 use Symfony\Component\Yaml\Yaml;
 
 class DICTest extends TestCase
@@ -28,7 +31,7 @@ class DICTest extends TestCase
      */
     public function return_false_for_a_wrong_configurated_entries()
     {
-        $config = Yaml::parseFile(__DIR__.'/../config/wrong.yaml');
+        $config = Yaml::parseFile(__DIR__ . '/../config/yaml/wrong.yaml');
         $dic = DIC::init($config);
 
         $this->assertFalse($dic::get('acme-repo'));
@@ -40,7 +43,7 @@ class DICTest extends TestCase
      */
     public function return_entries()
     {
-        $config = Yaml::parseFile(__DIR__.'/../config/config.yaml');
+        $config = Yaml::parseFile(__DIR__ . '/../config/yaml/config.yaml');
         $dic = DIC::init($config);
 
         // 1) simple entry
@@ -84,8 +87,51 @@ class DICTest extends TestCase
      */
     public function return_entriesfdsfsdfds()
     {
-        $config = Yaml::parseFile(__DIR__.'/../config/database.yaml');
+        $config = Yaml::parseFile(__DIR__ . '/../config/yaml/database.yaml');
         $dic = DIC::init($config);
+
+        $this->assertTrue($dic::has('db'));
+        $this->assertInstanceOf(Database::class, $dic::get('db'));
+    }
+
+    /**
+     * @test
+     */
+    public function init_from_file_exception()
+    {
+        try {
+            $dic = DIC::initFromFile(__DIR__ . '/../config/txt/file.txt');
+        } catch (\Exception $e) {
+            $this->assertEquals('txt is not a valid configuration file.', $e->getMessage());
+        }
+    }
+
+    /**
+     * @test
+     * @throws \Exception
+     */
+    public function init_from_file()
+    {
+        // INI
+        $dic = DIC::initFromFile(__DIR__ . '/../config/ini/logger.ini');
+
+        $this->assertTrue($dic::has('logger'));
+        $this->assertInstanceOf(Logger::class, $dic::get('logger'));
+
+        // JSON
+        $dic = DIC::initFromFile(__DIR__ . '/../config/json/controller.json');
+
+        $this->assertTrue($dic::has('controller'));
+        $this->assertInstanceOf(Controller::class, $dic::get('controller'));
+
+        // XML
+        $dic = DIC::initFromFile(__DIR__ . '/../config/xml/router.xml');
+
+        $this->assertTrue($dic::has('router'));
+        $this->assertInstanceOf(Router::class, $dic::get('router'));
+
+        // YAML
+        $dic = DIC::initFromFile(__DIR__ . '/../config/yaml/database.yaml');
 
         $this->assertTrue($dic::has('db'));
         $this->assertInstanceOf(Database::class, $dic::get('db'));
