@@ -2,6 +2,8 @@
 
 namespace SimpleDIC\Parser;
 
+use SimpleDIC\Exceptions\ParserException;
+
 class Parser
 {
     /**
@@ -10,10 +12,10 @@ class Parser
     private static $allowedExtensions = ['json', 'ini', 'xml', 'yaml', 'yml'];
 
     /**
-     * @param string $filename
+     * @param $filename
      *
      * @return array
-     * @throws \Exception
+     * @throws ParserException
      */
     public static function parse($filename)
     {
@@ -25,7 +27,11 @@ class Parser
 
         $parser = self::getParser($ext);
 
-        return $parser->parse($filename);
+        try{
+            return $parser->parse($filename);
+        } catch (\Exception $e){
+            throw new ParserException($filename . ' cannot be parsed [' . $ext . ' driver used]' );
+        }
     }
 
     /**

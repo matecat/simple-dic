@@ -14,6 +14,7 @@ use SimpleDIC\Dummy\Controller;
 use SimpleDIC\Dummy\Database;
 use SimpleDIC\Dummy\Logger;
 use SimpleDIC\Dummy\Router;
+use SimpleDIC\Exceptions\ParserException;
 use Symfony\Component\Yaml\Yaml;
 
 class DICTest extends TestCase
@@ -96,6 +97,22 @@ class DICTest extends TestCase
             $dic = DIC::initFromFile(__DIR__ . '/../config/txt/file.txt');
         } catch (\Exception $e) {
             $this->assertEquals('txt is not a valid configuration file.', $e->getMessage());
+        }
+    }
+
+    /**
+     * @test
+     * @throws \Exception
+     */
+    public function throw_ParserException()
+    {
+        $file = __DIR__ . '/../config/ini/invalid.ini';
+
+        try {
+            DIC::initFromFile($file);
+        } catch (\Exception $e){
+            $this->assertInstanceOf(ParserException::class, $e);
+            $this->assertEquals($e->getMessage(), $file . ' cannot be parsed [ini driver used]');
         }
     }
 
