@@ -22,7 +22,7 @@ class Parser
         $ext = self::getExt($filename);
 
         if (false === in_array($ext, self::$allowedExtensions)) {
-            throw new \InvalidArgumentException($ext . ' is not a valid configuration file.');
+            throw new ParserException($ext . ' is not a valid extension [json, ini, xml, yaml, yml are supported].');
         }
 
         $parser = self::getParser($ext);

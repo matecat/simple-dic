@@ -94,9 +94,10 @@ class DICTest extends TestCase
     public function init_from_file_exception()
     {
         try {
-            $dic = DIC::initFromFile(__DIR__ . '/../config/txt/file.txt');
+            DIC::initFromFile(__DIR__ . '/../config/txt/file.txt');
         } catch (\Exception $e) {
-            $this->assertEquals('txt is not a valid configuration file.', $e->getMessage());
+            $this->assertInstanceOf(ParserException::class, $e);
+            $this->assertEquals('txt is not a valid extension [json, ini, xml, yaml, yml are supported].', $e->getMessage());
         }
     }
 
