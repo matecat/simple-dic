@@ -130,6 +130,10 @@ class DIC
                 $method          = isset($content['method']) ? $content['method'] : null;
                 $methodArguments = isset($content['method_arguments']) ? $content['method_arguments'] : null;
 
+                if (false === class_exists($class)) {
+                    return false;
+                }
+
                 // if specified, call a method
                 if ($method) {
 
@@ -146,16 +150,12 @@ class DIC
 
                     // if not, call the method with no arguments
                     try {
-                        return call_user_func([$class, $method]);
+                        return self::callClassMethod($class, $method);
                     } catch (\Error $error) {
                         return false;
                     } catch (\Exception $exception) {
                         return false;
                     }
-                }
-
-                if (false === class_exists($class)) {
-                    return false;
                 }
 
                 // if the method is not specified, call the constructor
@@ -170,6 +170,28 @@ class DIC
 
             return null;
         }
+    }
+
+    /**
+     * @param string $class
+     * @param string $method
+     *
+     * @return bool|mixed
+     * @throws \ReflectionException
+     */
+    private static function callClassMethod($class, $method)
+    {
+        $reflected = new \ReflectionClass($class);
+
+        if (false === $reflected->hasMethod($method)) {
+            return false;
+        }
+
+        if ($reflected->getMethod($method)->isStatic()) {
+            return call_user_func([$class, $method]);
+        }
+
+        return (new $class)->$method();
     }
 
     /**

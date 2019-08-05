@@ -111,7 +111,7 @@ class DICTest extends TestCase
 
         try {
             DIC::initFromFile($file);
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             $this->assertInstanceOf(ParserException::class, $e);
             $this->assertEquals($e->getMessage(), $file . ' cannot be parsed [ini driver used]');
         }
@@ -173,5 +173,16 @@ class DICTest extends TestCase
         $this->assertTrue($dic::has('logger'));
         $this->assertInstanceOf(Logger::class, $dic::get('logger'));
         $this->assertEquals('bar', $dic::get('logger')->getFoo());
+    }
+
+    /**
+     * @test
+     */
+    public function fsdfdsf()
+    {
+        $dic = DIC::initFromFile(__DIR__ . '/../config/ini/redis.ini');
+
+        $this->assertTrue($dic::has('redis'));
+        $this->assertInstanceOf(Client::class, $dic::get('redis'));
     }
 }

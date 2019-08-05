@@ -49,8 +49,8 @@ acme-repo:
 After pass the name of dependency, you can specify:
 
 * `class` : the full qualified class name 
-* `arguments`: an array of arguments to pass to instantiate the class
-* `method`: if you want to start a specific method of the class
+* `arguments`: an array of arguments to pass to instantiate the class from the constructor
+* `method`: if you want to run a specific method of the class (method could be static or not not)
 * `method_arguments`: an array of arguments to pass to instantiate the runned class method
 
 If you want to pass an entry already present to other one, simply use the '@' symbol.

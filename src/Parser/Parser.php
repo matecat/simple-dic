@@ -12,7 +12,7 @@ class Parser
     private static $allowedExtensions = ['json', 'ini', 'xml', 'yaml', 'yml'];
 
     /**
-     * @param $filename
+     * @param string $filename
      *
      * @return array
      * @throws ParserException
@@ -27,10 +27,10 @@ class Parser
 
         $parser = self::getParser($ext);
 
-        try{
+        try {
             return $parser->parse($filename);
-        } catch (\Exception $e){
-            throw new ParserException($filename . ' cannot be parsed [' . $ext . ' driver used]' );
+        } catch (\Exception $e) {
+            throw new ParserException($filename . ' cannot be parsed [' . $ext . ' driver used]');
         }
     }
 
