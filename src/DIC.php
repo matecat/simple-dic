@@ -114,7 +114,7 @@ class DIC
      *
      * @return mixed|bool|null
      */
-    public static function set($key, $content)
+    private static function set($key, $content)
     {
         if (false === self::has($key)) {
             self::$container[$key] = function ($c) use ($content) {
