@@ -125,42 +125,16 @@ class DIC
                 }
 
                 // otherwise it's a class, so extract variables
-                $class           = isset($content['class']) ? $content['class'] : null;
+                $class           = $content['class'];
                 $classArguments  = isset($content['arguments']) ? $content['arguments'] : null;
                 $method          = isset($content['method']) ? $content['method'] : null;
                 $methodArguments = isset($content['method_arguments']) ? $content['method_arguments'] : null;
 
-                if (false === class_exists($class)) {
-                    return false;
-                }
+                $methodArgsToInject = self::getArgumentsToInject($c, $methodArguments);
+                $classArgsToInject = self::getArgumentsToInject($c, $classArguments);
 
-                // if specified, call a method
-                if ($method) {
-
-                    // if specified, call the method with provided arguments
-                    if ($methodArguments) {
-                        try {
-                            return call_user_func_array([$class, $method], self::getArgumentsToInject($c, $methodArguments));
-                        } catch (\Error $error) {
-                            return false;
-                        } catch (\Exception $exception) {
-                            return false;
-                        }
-                    }
-
-                    // if not, call the method with no arguments
-                    try {
-                        return self::callClassMethod($class, $method);
-                    } catch (\Error $error) {
-                        return false;
-                    } catch (\Exception $exception) {
-                        return false;
-                    }
-                }
-
-                // if the method is not specified, call the constructor
                 try {
-                    return new $class(...self::getArgumentsToInject($c, $classArguments));
+                    return self::instantiateTheClass($class, $classArgsToInject, $method, $methodArgsToInject);
                 } catch (\Error $error) {
                     return false;
                 } catch (\Exception $exception) {
@@ -174,24 +148,43 @@ class DIC
 
     /**
      * @param string $class
-     * @param string $method
+     * @param array $classArguments
+     * @param null $method
+     * @param array $methodArguments
      *
-     * @return bool|mixed
+     * @return mixed|bool
+     *
      * @throws \ReflectionException
      */
-    private static function callClassMethod($class, $method)
+    private static function instantiateTheClass($class, array $classArguments = [], $method = null, array $methodArguments = [])
     {
+        if (false === class_exists($class)) {
+            return false;
+        }
+
         $reflected = new \ReflectionClass($class);
+
+        // 1. the class has no method to call
+        if (null == $method) {
+            return new $class(...$classArguments);
+        }
 
         if (false === $reflected->hasMethod($method)) {
             return false;
         }
 
+        // 2. the method to call is static
         if ($reflected->getMethod($method)->isStatic()) {
-            return call_user_func([$class, $method]);
+            return $class::$method(...$methodArguments);
         }
 
-        return (new $class)->$method();
+        // 3. the class has a private constructor
+        if ($reflected->getConstructor()->isPrivate()) {
+            return call_user_func_array([$class, $method], $methodArguments);
+        }
+
+        // 4. the class has a public constructor
+        return (new $class(...$classArguments))->$method(...$methodArguments);
     }
 
     /**

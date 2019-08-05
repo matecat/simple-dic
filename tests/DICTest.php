@@ -177,8 +177,9 @@ class DICTest extends TestCase
 
     /**
      * @test
+     * @throws \Exception
      */
-    public function fsdfdsf()
+    public function init_with_redis()
     {
         $dic = DIC::initFromFile(__DIR__ . '/../config/ini/redis.ini');
 

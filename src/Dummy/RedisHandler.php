@@ -11,12 +11,27 @@ class RedisHandler
     private $client;
 
     /**
+     * @var string
+     */
+    private $dns;
+
+    /**
+     * RedisHandler constructor.
+     *
+     * @param string $dns
+     */
+    public function __construct($dns)
+    {
+        $this->dns = $dns;
+    }
+
+    /**
      * @return Client
      */
     public function getConnection()
     {
         if ($this->client === null) {
-            $this->client = new Client('mauretto78', '12432');
+            $this->client = new Client('dummy', '12432');
         }
 
         return $this->client;

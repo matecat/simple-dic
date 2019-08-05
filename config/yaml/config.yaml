@@ -6,6 +6,7 @@ acme:
   class: SimpleDIC\Dummy\Acme
 acme-calculator:
   class: SimpleDIC\Dummy\AcmeCalculator
+  arguments: ['@three', '@two']
   method: init
   method_arguments: ['@three', '@two']
 acme-parser:
