@@ -179,7 +179,7 @@ class DIC
         }
 
         // 3. the class has a private constructor
-        if ($reflected->getConstructor()->isPrivate()) {
+        if ($reflected->hasMethod('__construct') and $reflected->getConstructor()->isPrivate()) {
             return call_user_func_array([$class, $method], $methodArguments);
         }
 
