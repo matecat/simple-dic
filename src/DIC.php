@@ -2,26 +2,54 @@
 
 namespace SimpleDIC;
 
-use Pimple\Container;
 use SimpleDIC\Parser\Parser;
 
 class DIC
 {
     /**
-     * @var Container
+     * @var string
      */
-    private static $container;
+    private static $filename;
 
     /**
-     * DIC constructor.
+     * @param string $filename
      *
-     * @param array $config
+     * @throws Exceptions\ParserException
      */
-    private function __construct(array $config = [])
+    public static function initFromFile($filename)
     {
-        self::$container = new Container();
+        self::$filename = $filename;
 
-        $this->resolveDependencies($config);
+        // save cache file
+        if(false === file_exists($sha1file = self::getCacheFilePath())){
+
+            $cachedMap = [];
+
+            foreach (Parser::parse(self::$filename) as $key => $content) {
+                $cachedMap[$key] = self::setInCache($cachedMap, $content);
+
+            }
+
+            file_put_contents($sha1file, '<?php return unserialize(\''. serialize($cachedMap) .'\');' . PHP_EOL );
+        }
+    }
+
+    /**
+     * @param string $filename
+     *
+     * @return string
+     */
+    private static function getCacheFilePath()
+    {
+        return __DIR__.'/../_cache/' . sha1_file(self::$filename) .'.php';
+    }
+
+    /**
+     * @return mixed
+     */
+    private static function getCache()
+    {
+        return include(self::getCacheFilePath());
     }
 
     /**
@@ -29,30 +57,31 @@ class DIC
      */
     public static function count()
     {
-        return count(self::keys());
+        return count(self::getCache());
     }
 
     /**
-     * Initialise the DIC
+     * @param string $id
      *
-     * @param array $config
-     *
-     * @return DIC
+     * @return mixed
      */
-    public static function init(array $config = [])
-    {
-        return new self($config);
+    public static function get( $id ) {
+        if(self::has($id)){
+            return self::getCache()[$id];
+        }
     }
 
     /**
-     * @param string $filename
+     * @param string $id
      *
-     * @return DIC
-     * @throws \Exception
+     * @return bool
      */
-    public static function initFromFile($filename)
-    {
-        return new self(Parser::parse($filename));
+    public static function has( $id ) {
+        if(false === file_exists($sha1file = self::getCacheFilePath())){
+            return false;
+        }
+
+        return isset(self::getCache()[$id]);
     }
 
     /**
@@ -60,89 +89,39 @@ class DIC
      */
     public static function keys()
     {
-        return self::$container->keys();
-    }
-
-    /**
-     * Resolve the dependencies and register into the DIC
-     *
-     * @param array $config
-     */
-    private function resolveDependencies(array $config = [])
-    {
-        foreach ($config as $key => $content) {
-            self::set($key, $content);
-        }
-    }
-
-    /**
-     *
-     * Check for an entry existence within the container
-     *
-     * @param string $dependency
-     *
-     * @return bool
-     */
-    public static function has($dependency)
-    {
-        return isset(self::$container[$dependency]);
-    }
-
-    /**
-     * Get an entry from the container.
-     *
-     * The method returns:
-     * - false if the entry has a wrong configuration
-     * - NULL if the entry does not exists
-     *
-     * @param string $dependency
-     *
-     * @return mixed
-     */
-    public static function get($dependency)
-    {
-        if (self::has($dependency)) {
-            return self::$container[$dependency];
-        }
+        return array_keys(self::getCache());
     }
 
     /**
      * Set an entry in the container.
      *
-     * @param string $key
-     * @param array|mixed $content
+     * @param array $cachedMap
+     * @param mixed $content
      *
      * @return mixed|bool|null
      */
-    private static function set($key, $content)
+    private static function setInCache($cachedMap, $content)
     {
-        if (false === self::has($key)) {
-            self::$container[$key] = function ($c) use ($content) {
+        // if is not a class set the entry value in DIC
+        if (false === isset($content['class'])) {
+            return self::getFromEnvOrDICParams($content);
+        }
 
-                // if is not a class set the entry value in DIC
-                if (false === isset($content['class'])) {
-                    return self::getFromEnvOrDICParams($content);
-                }
+        // otherwise it's a class, so extract variables
+        $class           = $content['class'];
+        $classArguments  = isset($content['arguments']) ? $content['arguments'] : null;
+        $method          = isset($content['method']) ? $content['method'] : null;
+        $methodArguments = isset($content['method_arguments']) ? $content['method_arguments'] : null;
 
-                // otherwise it's a class, so extract variables
-                $class           = $content['class'];
-                $classArguments  = isset($content['arguments']) ? $content['arguments'] : null;
-                $method          = isset($content['method']) ? $content['method'] : null;
-                $methodArguments = isset($content['method_arguments']) ? $content['method_arguments'] : null;
+        $methodArgsToInject = self::getArgumentsToInject($cachedMap, $methodArguments);
+        $classArgsToInject = self::getArgumentsToInject($cachedMap, $classArguments);
 
-                $methodArgsToInject = self::getArgumentsToInject($c, $methodArguments);
-                $classArgsToInject = self::getArgumentsToInject($c, $classArguments);
-
-                try {
-                    return self::instantiateTheClass($class, $classArgsToInject, $method, $methodArgsToInject);
-                } catch (\Error $error) {
-                    return false;
-                } catch (\Exception $exception) {
-                    return false;
-                }
-            };
-
-            return null;
+        try {
+            return self::instantiateTheClass($class, $classArgsToInject, $method, $methodArgsToInject);
+        } catch (\Error $error) {
+            return false;
+        } catch (\Exception $exception) {
+            return false;
         }
     }
 
@@ -190,18 +169,18 @@ class DIC
     /**
      * Get the arguments to inject into the class to instantiate within DIC.
      *
-     * @param Container $c
-     * @param null      $providedArguments
+     * @param array $cachedMap
+     * @param null  $providedArguments
      *
      * @return array
      */
-    private static function getArgumentsToInject(Container $c, $providedArguments = null)
+    private static function getArgumentsToInject(array $cachedMap = [], $providedArguments = null)
     {
         $returnArguments = [];
 
         if (null != $providedArguments) {
             foreach ($providedArguments as $argument) {
-                $returnArguments[] = self::getArgumentToInject($argument, $c);
+                $returnArguments[] = self::getArgumentToInject($cachedMap, $argument);
             }
         }
 
@@ -209,18 +188,16 @@ class DIC
     }
 
     /**
-     * @param   string        $argument
-     * @param Container $c
+     * @param array $cachedMap
+     * @param string $argument
      *
      * @return mixed|string|null
      */
-    private static function getArgumentToInject($argument, Container $c)
+    private static function getArgumentToInject(array $cachedMap = [], $argument)
     {
-        if (isset($c[ltrim($argument, '@')])) {
-            return $c[ltrim($argument, '@')];
-        }
+        $id = ltrim($argument, '@');
 
-        return self::getFromEnvOrDICParams($argument);
+        return (isset($cachedMap[$id])) ? $cachedMap[$id] : self::getFromEnvOrDICParams($argument);
     }
 
     /**

@@ -15,18 +15,12 @@ use SimpleDIC\Dummy\Database;
 use SimpleDIC\Dummy\Logger;
 use SimpleDIC\Dummy\Router;
 use SimpleDIC\Exceptions\ParserException;
-use Symfony\Component\Yaml\Yaml;
 
-class DICTest extends TestCase
+class DIC_Test extends TestCase
 {
-    /**
-     * @test
-     */
-    public function return_null_a_not_existing_entry()
-    {
-        $dic = DIC::init([]);
-
-        $this->assertNull($dic::get('key'));
+    public function __construct( $name = null, array $data = [], $dataName = '' ) {
+        parent::__construct( $name, $data, $dataName );
+        putenv("FOO=bar");
     }
 
     /**
@@ -34,12 +28,14 @@ class DICTest extends TestCase
      */
     public function return_false_for_a_wrong_configurated_entries()
     {
-        $config = Yaml::parseFile(__DIR__ . '/../config/yaml/wrong.yaml');
-        $dic = DIC::init($config);
+        DIC::initFromFile(__DIR__ . '/../config/yaml/wrong.yaml');
 
-        $this->assertFalse($dic::get('acme-repo'));
-        $this->assertFalse($dic::get('acme-calculator'));
-        $this->assertFalse($dic::get('not-existing'));
+        $this->assertTrue(DIC::has('acme-repo'));
+        $this->assertTrue(DIC::has('acme-calculator'));
+        $this->assertTrue(DIC::has('not-existing'));
+        $this->assertFalse(DIC::get('acme-repo'));
+        $this->assertFalse(DIC::get('acme-calculator'));
+        $this->assertFalse(DIC::get('not-existing'));
     }
 
     /**
@@ -47,33 +43,32 @@ class DICTest extends TestCase
      */
     public function init()
     {
-        $config = Yaml::parseFile(__DIR__ . '/../config/yaml/config.yaml');
-        $dic = DIC::init($config);
+        DIC::initFromFile(__DIR__ . '/../config/yaml/config.yaml');
 
         // 1) simple entries
-        $this->assertTrue($dic::has('dummy-key'));
-        $this->assertTrue($dic::has('dummy-array'));
-        $this->assertEquals($dic::get('dummy-key'), 'dummy-value');
-        $this->assertEquals($dic::get('dummy-array'), [43243,2432,4324,445667]);
+        $this->assertTrue(DIC::has('dummy-key'));
+        $this->assertTrue(DIC::has('dummy-array'));
+        $this->assertEquals(DIC::get('dummy-key'), 'dummy-value');
+        $this->assertEquals(DIC::get('dummy-array'), [43243,2432,4324,445667]);
 
         // 2) simple class
-        $this->assertTrue($dic::has('acme'));
-        $this->assertInstanceOf(Acme::class, $dic::get('acme'));
+        $this->assertTrue(DIC::has('acme'));
+        $this->assertInstanceOf(Acme::class, DIC::get('acme'));
 
         // 3) class with arguments
-        $this->assertTrue($dic::has('acme-parser'));
-        $this->assertInstanceOf(AcmeParser::class, $dic::get('acme-parser'));
-        $this->assertEquals('string', $dic::get('acme-parser')->parse());
+        $this->assertTrue(DIC::has('acme-parser'));
+        $this->assertInstanceOf(AcmeParser::class, DIC::get('acme-parser'));
+        $this->assertEquals('string', DIC::get('acme-parser')->parse());
 
         // 4) class with dependencies
-        $this->assertTrue($dic::has('acme-repo'));
-        $this->assertInstanceOf(AcmeRepo::class, $dic::get('acme-repo'));
-        $this->assertInstanceOf(Acme::class, $dic::get('acme-repo')->getAcme());
+        $this->assertTrue(DIC::has('acme-repo'));
+        $this->assertInstanceOf(AcmeRepo::class, DIC::get('acme-repo'));
+        $this->assertInstanceOf(Acme::class, DIC::get('acme-repo')->getAcme());
 
         // 5) class with method and method arguments
-        $this->assertTrue($dic::has('acme-calculator'));
-        $this->assertInstanceOf(AcmeCalculator::class, $dic::get('acme-calculator'));
-        $this->assertEquals(5, $dic::get('acme-calculator')->calculate());
+        $this->assertTrue(DIC::has('acme-calculator'));
+        $this->assertInstanceOf(AcmeCalculator::class, DIC::get('acme-calculator'));
+        $this->assertEquals(5, DIC::get('acme-calculator')->calculate());
 
         $this->assertEquals([
             'dummy-key',
@@ -84,8 +79,8 @@ class DICTest extends TestCase
             'acme-calculator',
             'acme-parser',
             'acme-repo',
-        ], $dic::keys());
-        $this->assertEquals(8, $dic::count());
+        ], DIC::keys());
+        $this->assertEquals(8, DIC::count());
     }
 
     /**
@@ -126,26 +121,26 @@ class DICTest extends TestCase
         // INI
         $dic = DIC::initFromFile(__DIR__ . '/../config/ini/logger.ini');
 
-        $this->assertTrue($dic::has('logger'));
-        $this->assertInstanceOf(Logger::class, $dic::get('logger'));
+        $this->assertTrue(DIC::has('logger'));
+        $this->assertInstanceOf(Logger::class, DIC::get('logger'));
 
         // JSON
         $dic = DIC::initFromFile(__DIR__ . '/../config/json/controller.json');
 
-        $this->assertTrue($dic::has('controller'));
-        $this->assertInstanceOf(Controller::class, $dic::get('controller'));
+        $this->assertTrue(DIC::has('controller'));
+        $this->assertInstanceOf(Controller::class, DIC::get('controller'));
 
         // XML
         $dic = DIC::initFromFile(__DIR__ . '/../config/xml/router.xml');
 
-        $this->assertTrue($dic::has('router'));
-        $this->assertInstanceOf(Router::class, $dic::get('router'));
+        $this->assertTrue(DIC::has('router'));
+        $this->assertInstanceOf(Router::class, DIC::get('router'));
 
         // YAML
         $dic = DIC::initFromFile(__DIR__ . '/../config/yaml/database.yaml');
 
-        $this->assertTrue($dic::has('db'));
-        $this->assertInstanceOf(Database::class, $dic::get('db'));
+        $this->assertTrue(DIC::has('db'));
+        $this->assertInstanceOf(Database::class, DIC::get('db'));
     }
 
     /**
@@ -156,9 +151,9 @@ class DICTest extends TestCase
         DICParams::initFromFile(__DIR__.'/../config/ini/parameters.ini');
         $dic = DIC::initFromFile(__DIR__ . '/../config/ini/client.ini');
 
-        $this->assertTrue($dic::has('client'));
-        $this->assertInstanceOf(Client::class, $dic::get('client'));
-        $this->assertEquals('mauretto78', $dic::get('client')->getUsername());
+        $this->assertTrue(DIC::has('client'));
+        $this->assertInstanceOf(Client::class, DIC::get('client'));
+        $this->assertEquals('mauretto78', DIC::get('client')->getUsername());
     }
 
     /**
@@ -166,13 +161,13 @@ class DICTest extends TestCase
      */
     public function init_with_env_variables()
     {
-        putenv("FOO=bar");
 
-        $dic = DIC::initFromFile(__DIR__ . '/../config/ini/logger.ini');
 
-        $this->assertTrue($dic::has('logger'));
-        $this->assertInstanceOf(Logger::class, $dic::get('logger'));
-        $this->assertEquals('bar', $dic::get('logger')->getFoo());
+        DIC::initFromFile(__DIR__ . '/../config/ini/logger.ini');
+
+        $this->assertTrue(DIC::has('logger'));
+        $this->assertInstanceOf(Logger::class, DIC::get('logger'));
+        $this->assertEquals('bar', DIC::get('logger')->getFoo());
     }
 
     /**
@@ -183,7 +178,7 @@ class DICTest extends TestCase
     {
         $dic = DIC::initFromFile(__DIR__ . '/../config/ini/redis.ini');
 
-        $this->assertTrue($dic::has('redis'));
-        $this->assertInstanceOf(Client::class, $dic::get('redis'));
+        $this->assertTrue(DIC::has('redis'));
+        $this->assertInstanceOf(Client::class, DIC::get('redis'));
     }
 }
