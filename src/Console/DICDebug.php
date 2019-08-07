@@ -15,14 +15,16 @@ class DICDebug extends Command
     /**
      * DICDebug constructor.
      *
-     * @param array $config
-     * @param null  $name
+     * @param string $filename
+     * @param null $name
+     *
+     * @throws \SimpleDIC\Exceptions\ParserException
      */
-    public function __construct(array $config = [], $name = null)
+    public function __construct($filename, $name = null)
     {
         parent::__construct($name);
 
-        DIC::init($config);
+        DIC::initFromFile($filename);
     }
 
     protected function configure()
@@ -40,25 +42,15 @@ class DICDebug extends Command
         asort($keys);
 
         $table = new Table($output);
-        $table->setHeaders(['#', 'Alias', 'Type', 'Content']);
+        $table->setHeaders(['#', 'Alias', 'Type', 'Creation time (ms)', 'Memory usage', 'Content']);
 
         $i = 1;
         foreach ($keys as $key) {
-            $table->setRow($i, [$i, $key, $this->getType($key), $this->getValue($key)]);
+            $table->setRow($i, [$i, $key, DIC::getMetadata($key)['type'], DIC::getMetadata($key)['create_time'], DIC::getMetadata($key)['memory_usage'], $this->getValue($key)]);
             $i++;
         }
 
         $table->render();
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
-    private function getType($key)
-    {
-        return gettype(DIC::get($key));
     }
 
     /**

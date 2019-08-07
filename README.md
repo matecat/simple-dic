@@ -5,25 +5,11 @@
 [![Packagist](https://img.shields.io/packagist/v/mauretto78/simple-dic.svg)]()
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mauretto78/simple-dic/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mauretto78/simple-dic/?branch=master)
 
-**Simple DIC** is a simple Dependency Injection Container(DIC) built on top of [Pimple](https://github.com/silexphp/Pimple).
+**Simple DIC** is a simple Dependency Injection Container(DIC).
 
 ## Basic Usage
 
-To use DIC do the following:
-
-```php
-use SimpleDIC\DIC;
-
-$config = [...];
-
-DIC::init($config);
-```
-
-## Configuring DIC
-
-To init DIC you have to furnish an array of dependencies. 
-
-For your convenience you can use `initFromFile` method to parse the configuration from a file (ini, json, xml and yaml extension are supported).
+To init DIC you must provide a configuration file. Use `initFromFile` method:
 
 Here is a sample (in YAML format):
 
@@ -93,12 +79,13 @@ logger:
 
 ## Retrieve an entry
 
-In order to retrieve an entry simple do this:
+In order to retrieve an entry (and its metadata if you need it) simple do this:
 
 ```php
 use SimpleDIC\DIC;
 
 $dependency = DIC::get('key');
+$metadata = DIC::getMetadata('key');
 ```
 
 Please note that the method returns:
@@ -126,10 +113,10 @@ use Symfony\Component\Yaml\Yaml;
 $app = new \Symfony\Component\Console\Application('Simple DIC', 'console tool');
 
 // config
-$config = Yaml::parseFile(__DIR__.'/../config/config.yaml');
+$configFile = __DIR__.'/../config/yaml/config.yaml';
 
 // add commands here
-$app->add(new \SimpleDIC\Console\DICDebug($config));
+$app->add(new \SimpleDIC\Console\DICDebug($configFile));
 $app->run();
 ```
 

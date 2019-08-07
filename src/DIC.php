@@ -20,28 +20,61 @@ class DIC
     {
         self::$filename = $filename;
 
-        // save cache file
-        if(false === file_exists($sha1file = self::getCacheFilePath())){
-
+        // create cache file if does not exists
+        if (false === file_exists($sha1file = self::getCacheFilePath())) {
             $cachedMap = [];
 
             foreach (Parser::parse(self::$filename) as $key => $content) {
-                $cachedMap[$key] = self::setInCache($cachedMap, $content);
+                $start = microtime(true);
+                $memoryUsage = memory_get_usage();
 
+                $cachedMap[$key] = [
+                    'value'     => self::setInCache($cachedMap, $content),
+                    '@metadata' => [
+                        'type'         => gettype(self::setInCache($cachedMap, $content)),
+                        'create_time'  => self::calculateCreatingTime($start),
+                        'memory_usage' => (memory_get_usage() - $memoryUsage),
+                    ],
+                ];
             }
 
-            file_put_contents($sha1file, '<?php return unserialize(\''. serialize($cachedMap) .'\');' . PHP_EOL );
+            if (false === is_dir(self::getCacheDir())) {
+                mkdir(self::getCacheDir(), 0755, true);
+            }
+
+            file_put_contents($sha1file, '<?php return unserialize(\''. serialize($cachedMap) .'\');' . PHP_EOL);
         }
     }
 
     /**
-     * @param string $filename
+     * @param float $start
      *
+     * @return float
+     */
+    private static function calculateCreatingTime($start)
+    {
+        $stringval = microtime(true) - $start;
+        $numericval = sscanf((string)$stringval, "%f")[0];
+
+        $seconds = number_format($numericval, 8);
+
+        return (float)$seconds * 1000000;
+    }
+
+    /**
+     * @return string
+     */
+    private static function getCacheDir()
+    {
+        return __DIR__.'/../_cache/';
+    }
+
+    /**
      * @return string
      */
     private static function getCacheFilePath()
     {
-        return __DIR__.'/../_cache/' . sha1_file(self::$filename) .'.php';
+        return self::getCacheDir() . sha1_file(self::$filename) .'.php';
     }
 
     /**
@@ -65,9 +98,22 @@ class DIC
      *
      * @return mixed
      */
-    public static function get( $id ) {
-        if(self::has($id)){
-            return self::getCache()[$id];
+    public static function get($id)
+    {
+        if (self::has($id)) {
+            return self::getCache()[$id]['value'];
+        }
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return mixed
+     */
+    public static function getMetadata($id)
+    {
+        if (self::has($id)) {
+            return self::getCache()[$id]['@metadata'];
         }
     }
 
@@ -76,8 +122,9 @@ class DIC
      *
      * @return bool
      */
-    public static function has( $id ) {
-        if(false === file_exists($sha1file = self::getCacheFilePath())){
+    public static function has($id)
+    {
+        if (false === file_exists($sha1file = self::getCacheFilePath())) {
             return false;
         }
 
@@ -197,7 +244,7 @@ class DIC
     {
         $id = ltrim($argument, '@');
 
-        return (isset($cachedMap[$id])) ? $cachedMap[$id] : self::getFromEnvOrDICParams($argument);
+        return (isset($cachedMap[$id])) ? $cachedMap[$id]['value'] : self::getFromEnvOrDICParams($argument);
     }
 
     /**

@@ -18,8 +18,9 @@ use SimpleDIC\Exceptions\ParserException;
 
 class DIC_Test extends TestCase
 {
-    public function __construct( $name = null, array $data = [], $dataName = '' ) {
-        parent::__construct( $name, $data, $dataName );
+    public function __construct($name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
         putenv("FOO=bar");
     }
 
@@ -161,8 +162,6 @@ class DIC_Test extends TestCase
      */
     public function init_with_env_variables()
     {
-
-
         DIC::initFromFile(__DIR__ . '/../config/ini/logger.ini');
 
         $this->assertTrue(DIC::has('logger'));
@@ -180,5 +179,6 @@ class DIC_Test extends TestCase
 
         $this->assertTrue(DIC::has('redis'));
         $this->assertInstanceOf(Client::class, DIC::get('redis'));
+        $this->assertEquals('object', DIC::getMetadata('redis')['type']);
     }
 }
