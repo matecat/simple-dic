@@ -175,7 +175,8 @@ class DIC_Test extends TestCase
      */
     public function init_with_redis()
     {
-        $dic = DIC::initFromFile(__DIR__ . '/../config/ini/redis.ini');
+        DIC::setCacheDir(__DIR__.'/../_cache_custom');
+        DIC::initFromFile(__DIR__ . '/../config/ini/redis.ini');
 
         $this->assertTrue(DIC::has('redis'));
         $this->assertInstanceOf(Client::class, DIC::get('redis'));

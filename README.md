@@ -41,6 +41,17 @@ After pass the name of dependency, you can specify:
 
 If you want to pass an entry already present to other one, simply use the '@' symbol.
 
+## Change Caching Directory
+
+You cah use `setCacheDir` to setup yor cache directory. Do this **before** invoke `initFromFile` method:
+
+```php
+DIC::setCacheDir(__DIR__.'/../_cache_custom');
+DIC::initFromFile(__DIR__ . '/../config/ini/redis.ini');
+
+// ...
+```
+
 ## Parameters
 
 If you want to use a separate parameters file, you can use `DICParams` class. Take a look at the following example of params configuration file

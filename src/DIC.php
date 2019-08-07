@@ -12,6 +12,11 @@ class DIC
     private static $filename;
 
     /**
+     * @var string
+     */
+    private static $cacheDir;
+
+    /**
      * @param string $filename
      *
      * @throws Exceptions\ParserException
@@ -55,10 +60,17 @@ class DIC
     {
         $stringval = microtime(true) - $start;
         $numericval = sscanf((string)$stringval, "%f")[0];
-
         $seconds = number_format($numericval, 8);
 
         return (float)$seconds * 1000000;
+    }
+
+    /**
+     * @param string $cacheDir
+     */
+    public static function setCacheDir($cacheDir)
+    {
+        self::$cacheDir = $cacheDir;
     }
 
     /**
@@ -66,7 +78,7 @@ class DIC
      */
     private static function getCacheDir()
     {
-        return __DIR__.'/../_cache/';
+        return (self::$cacheDir) ? self::$cacheDir : __DIR__.'/../_cache/';
     }
 
     /**
@@ -74,7 +86,7 @@ class DIC
      */
     private static function getCacheFilePath()
     {
-        return self::getCacheDir() . sha1_file(self::$filename) .'.php';
+        return self::getCacheDir() . DIRECTORY_SEPARATOR . sha1_file(self::$filename) .'.php';
     }
 
     /**
