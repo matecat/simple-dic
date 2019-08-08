@@ -181,5 +181,10 @@ class DIC_Test extends TestCase
         $this->assertTrue(DIC::has('redis'));
         $this->assertInstanceOf(Client::class, DIC::get('redis'));
         $this->assertEquals('object', DIC::getMetadata('redis')['type']);
+
+        $i1 = DIC::get('redis');
+        $i2 = DIC::get('redis');
+
+        $this->assertSame($i1, $i2);
     }
 }

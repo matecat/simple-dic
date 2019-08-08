@@ -7,9 +7,9 @@ use SimpleDIC\Parser\Parser;
 class DIC
 {
     /**
-     * @var string
+     * @var array
      */
-    private static $filename;
+    private static $cache;
 
     /**
      * @var string
@@ -23,13 +23,11 @@ class DIC
      */
     public static function initFromFile($filename)
     {
-        self::$filename = $filename;
-
         // create cache file if does not exists
-        if (false === file_exists($sha1file = self::getCacheFilePath())) {
+        if (false === file_exists($sha1file = self::getCacheFilePath($filename))) {
             $cachedMap = [];
 
-            foreach (Parser::parse(self::$filename) as $key => $content) {
+            foreach (Parser::parse($filename) as $key => $content) {
                 $start = microtime(true);
                 $memoryUsage = memory_get_usage();
 
@@ -49,6 +47,8 @@ class DIC
 
             file_put_contents($sha1file, '<?php return unserialize(\''. serialize($cachedMap) .'\');' . PHP_EOL);
         }
+
+        self::$cache = include(self::getCacheFilePath($filename));
     }
 
     /**
@@ -84,17 +84,9 @@ class DIC
     /**
      * @return string
      */
-    private static function getCacheFilePath()
+    private static function getCacheFilePath($filename)
     {
-        return self::getCacheDir() . DIRECTORY_SEPARATOR . sha1_file(self::$filename) .'.php';
-    }
-
-    /**
-     * @return mixed
-     */
-    private static function getCache()
-    {
-        return include(self::getCacheFilePath());
+        return self::getCacheDir() . DIRECTORY_SEPARATOR . sha1_file($filename) .'.php';
     }
 
     /**
@@ -102,7 +94,7 @@ class DIC
      */
     public static function count()
     {
-        return count(self::getCache());
+        return count(self::$cache);
     }
 
     /**
@@ -113,7 +105,7 @@ class DIC
     public static function get($id)
     {
         if (self::has($id)) {
-            return self::getCache()[$id]['value'];
+            return self::$cache[$id]['value'];
         }
     }
 
@@ -125,7 +117,7 @@ class DIC
     public static function getMetadata($id)
     {
         if (self::has($id)) {
-            return self::getCache()[$id]['@metadata'];
+            return self::$cache[$id]['@metadata'];
         }
     }
 
@@ -136,11 +128,7 @@ class DIC
      */
     public static function has($id)
     {
-        if (false === file_exists($sha1file = self::getCacheFilePath())) {
-            return false;
-        }
-
-        return isset(self::getCache()[$id]);
+        return isset(self::$cache[$id]);
     }
 
     /**
@@ -148,7 +136,7 @@ class DIC
      */
     public static function keys()
     {
-        return array_keys(self::getCache());
+        return array_keys(self::$cache);
     }
 
     /**
