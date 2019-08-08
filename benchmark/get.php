@@ -3,18 +3,20 @@ use SimpleDIC\DIC;
 
 include __DIR__.'/../vendor/autoload.php';
 
-DIC::initFromFile(__DIR__ . '/../config/ini/redis.ini');
+$config = __DIR__ . '/../config/ini/redis.ini';
+DIC::initFromFile($config);
 
-$max = 1000000;
+$max = 100000;
+
 $start = microtime(true);
 $memoryUsage = memory_get_usage();
-for ($i=0;$i<$max;$i++){
-    DIC::get('redis');
+for ($i=0;$i<$max;$i++) {
+    $redis = DIC::get('redis');
 }
 
 $stringval = microtime(true) - $start;
 $numericval = sscanf((string)$stringval, "%f")[0];
-$seconds = number_format($numericval, 8);
+$seconds = number_format($numericval, 2);
 
 echo PHP_EOL;
 echo '----------------------------------';
