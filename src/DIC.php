@@ -116,7 +116,7 @@ class DIC
     /**
      * @param string $id
      *
-     * @return mixed
+     * @return mixed|null
      */
     public static function get($id)
     {
@@ -126,7 +126,7 @@ class DIC
     /**
      * @param string $id
      *
-     * @return array
+     * @return array|null
      */
     public static function getMetadata($id)
     {
@@ -167,16 +167,13 @@ class DIC
         }
 
         // otherwise it's a class, so extract variables
-        $class = $content['class'];
-        $classArguments = isset($content['arguments']) ? $content['arguments'] : null;
-        $method = isset($content['method']) ? $content['method'] : null;
-        $methodArguments = isset($content['method_arguments']) ? $content['method_arguments'] : null;
+        extract($content);
 
-        $methodArgsToInject = self::getArgumentsToInject($cachedMap, $methodArguments);
-        $classArgsToInject = self::getArgumentsToInject($cachedMap, $classArguments);
+        $methodArgsToInject = self::getArgumentsToInject($cachedMap, isset($method_arguments) ? $method_arguments : null);
+        $classArgsToInject = self::getArgumentsToInject($cachedMap, isset($arguments) ? $arguments : null);
 
         try {
-            return self::instantiateTheClass($class, $classArgsToInject, $method, $methodArgsToInject);
+            return self::instantiateTheClass($class, $classArgsToInject, isset($method) ? $method : null, $methodArgsToInject);
         } catch (\Error $error) {
             return false;
         } catch (\Exception $exception) {
