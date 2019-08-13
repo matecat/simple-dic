@@ -3,5 +3,6 @@
 .phpunit.result.cache
 _cache
 _cache_custom
+_cache_sudo
 composer.lock
 vendor

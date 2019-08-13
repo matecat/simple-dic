@@ -59,10 +59,14 @@ class DIC
         }
 
         if (false === is_dir(self::getCacheDir())) {
-            mkdir(self::getCacheDir(), 0755, true);
+            if(false === mkdir(self::getCacheDir(), 0755, true)){
+                throw new \Exception(self::getCacheDir() . ' is not a writable directory.');
+            }
         }
 
-        file_put_contents(self::getCacheFilePath($filename), '<?php return unserialize(\'' . serialize($cachedMap) . '\');' . PHP_EOL);
+        if(false === file_put_contents(self::getCacheFilePath($filename), '<?php return unserialize(\'' . serialize($cachedMap) . '\');' . PHP_EOL)) {
+            throw new \Exception(' Can\'t write cache file.');
+        }
     }
 
     /**
