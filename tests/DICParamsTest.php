@@ -10,16 +10,6 @@ class DICParamsTest extends TestCase
     /**
      * @test
      */
-    public function return_null_a_not_existing_entry()
-    {
-        $dicParams = DICParams::init([]);
-
-        $this->assertNull($dicParams::get('key'));
-    }
-
-    /**
-     * @test
-     */
     public function init_from_file()
     {
         $dicParams = DICParams::initFromFile(__DIR__.'/../config/ini/parameters.ini');

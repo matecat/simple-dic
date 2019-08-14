@@ -21,16 +21,6 @@ class DICParams
     }
 
     /**
-     * @param array $params
-     *
-     * @return DICParams
-     */
-    public static function init(array $params = [])
-    {
-        return new self($params);
-    }
-
-    /**
      * @param string $filename
      *
      * @return DICParams

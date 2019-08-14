@@ -31,11 +31,8 @@ class DIC_Test extends TestCase
     {
         DIC::initFromFile(__DIR__ . '/../config/yaml/wrong.yaml');
 
-        $this->assertTrue(DIC::has('acme-repo'));
-        $this->assertTrue(DIC::has('acme-calculator'));
-        $this->assertTrue(DIC::has('not-existing'));
-        $this->assertFalse(DIC::get('acme-repo'));
-        $this->assertFalse(DIC::get('acme-calculator'));
+        $this->assertFalse(DIC::has('acme-repo'));
+        $this->assertFalse(DIC::has('acme-calculator'));
         $this->assertFalse(DIC::get('not-existing'));
     }
 
@@ -71,16 +68,6 @@ class DIC_Test extends TestCase
         $this->assertInstanceOf(AcmeCalculator::class, DIC::get('acme-calculator'));
         $this->assertEquals(5, DIC::get('acme-calculator')->calculate());
 
-        $this->assertEquals([
-            'dummy-key',
-            'dummy-array',
-            'three',
-            'two',
-            'acme',
-            'acme-calculator',
-            'acme-parser',
-            'acme-repo',
-        ], DIC::keys());
         $this->assertEquals(8, DIC::count());
     }
 
@@ -180,7 +167,6 @@ class DIC_Test extends TestCase
 
         $this->assertTrue(DIC::has('redis'));
         $this->assertInstanceOf(Client::class, DIC::get('redis'));
-        $this->assertEquals('object', DIC::getMetadata('redis')['type']);
 
         $i1 = DIC::get('redis');
         $i2 = DIC::get('redis');

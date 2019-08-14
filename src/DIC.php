@@ -9,6 +9,11 @@ class DIC
     /**
      * @var array
      */
+    private static $values;
+
+    /**
+     * @var array
+     */
     private static $cache;
 
     /**
@@ -23,72 +28,32 @@ class DIC
      */
     public static function initFromFile($filename)
     {
-        $cacheFile = self::getCacheFilePath($filename);
+        self::$values = [];
+        $mapFile = self::getCacheDir(). DIRECTORY_SEPARATOR .sha1($filename).'.php';
 
-        // save cache file if does not exists
-        if (false === file_exists($cacheFile)) {
-            self::saveCacheFile($filename);
-        }
+        if(false === file_exists($mapFile)){
+            if (false === is_dir(self::getCacheDir())) {
+                if(false === mkdir(self::getCacheDir(), 0755, true)){
+                    throw new \Exception(self::getCacheDir() . ' is not a writable directory.');
+                }
+            }
 
-        self::$cache = include($cacheFile);
-    }
-
-    /**
-     * @param string $filename
-     *
-     * @throws Exceptions\ParserException
-     */
-    private static function saveCacheFile($filename)
-    {
-        $cachedMap = [];
-
-        foreach (Parser::parse($filename) as $key => $content) {
-            $start = microtime(true);
-            $memoryUsage = memory_get_usage();
-            $value = self::setInCache($cachedMap, $content);
-            $allocatedSize = (memory_get_usage() - $memoryUsage);
-
-            $cachedMap[$key] = [
-                'value' => $value,
-                '@metadata' => [
-                    'type' => gettype(self::setInCache($cachedMap, $content)),
-                    'create_time' => self::calculateCreatingTimeInMilliseconds($start),
-                    'memory_usage' => $allocatedSize,
-                ],
-            ];
-        }
-
-        if (false === is_dir(self::getCacheDir())) {
-            if(false === mkdir(self::getCacheDir(), 0755, true)){
-                throw new \Exception(self::getCacheDir() . ' is not a writable directory.');
+            if(false === file_put_contents($mapFile, '<?php return unserialize(\'' . serialize(Parser::parse($filename)) . '\');' . PHP_EOL)) {
+                throw new \Exception(' Can\'t write cache file.');
             }
         }
 
-        if(false === file_put_contents(self::getCacheFilePath($filename), '<?php return unserialize(\'' . serialize($cachedMap) . '\');' . PHP_EOL)) {
-            throw new \Exception(' Can\'t write cache file.');
-        }
+        self::$cache = include($mapFile);
     }
 
     /**
-     * @param float $start
+     * @param $dir
      *
-     * @return float
+     * @return mixed
      */
-    private static function calculateCreatingTimeInMilliseconds($start)
+    public static function setCacheDir($dir)
     {
-        $stringval = microtime(true) - $start;
-        $numericval = sscanf((string)$stringval, "%f")[0];
-        $seconds = number_format($numericval, 2);
-
-        return (float)$seconds * 1000;
-    }
-
-    /**
-     * @param string $cacheDir
-     */
-    public static function setCacheDir($cacheDir)
-    {
-        self::$cacheDir = $cacheDir;
+        return self::$cacheDir = $dir;
     }
 
     /**
@@ -96,17 +61,7 @@ class DIC
      */
     private static function getCacheDir()
     {
-        return (self::$cacheDir) ? self::$cacheDir : __DIR__ . '/../_cache/';
-    }
-
-    /**
-     * @param string $filename
-     *
-     * @return string
-     */
-    private static function getCacheFilePath($filename)
-    {
-        return self::getCacheDir() . DIRECTORY_SEPARATOR . sha1_file($filename) . '.php';
+        return (!empty(self::$cacheDir)) ? self::$cacheDir : __DIR__.'/../_cache';
     }
 
     /**
@@ -114,7 +69,7 @@ class DIC
      */
     public static function count()
     {
-        return count(self::$cache);
+        return count(self::$values);
     }
 
     /**
@@ -124,17 +79,47 @@ class DIC
      */
     public static function get($id)
     {
-        return isset(self::$cache[$id]) ? self::$cache[$id]['value'] : null;
+        if(false === isset(self::$values[$id])){
+            self::setValue($id);
+        }
+
+        return self::$values[$id];
     }
 
     /**
-     * @param string $id
+     * Set an entry in the container.
      *
-     * @return array|null
+     * @param array $cachedMap
+     * @param mixed $content
+     *
+     * @return bool
      */
-    public static function getMetadata($id)
+    private static function setValue($id)
     {
-        return isset(self::$cache[$id]) ? self::$cache[$id]['@metadata'] : null;
+        $content = self::$cache[$id];
+
+        // if is not a class set the entry value in DIC
+        if (false === isset($content['class'])) {
+            self::$values[$id] = self::getFromEnvOrDICParams($content);
+
+            return true;
+        }
+
+        // otherwise it's a class, so extract variables
+        extract($content);
+
+        $methodArgsToInject = self::getArgumentsToInject(isset($method_arguments) ? $method_arguments : null);
+        $classArgsToInject = self::getArgumentsToInject(isset($arguments) ? $arguments : null);
+
+        try {
+            self::$values[$id] = self::instantiateTheClass($class, $classArgsToInject, isset($method) ? $method : null, $methodArgsToInject);
+
+            return true;
+        } catch (\Error $error) {
+            return false;
+        } catch (\Exception $exception) {
+            return false;
+        }
     }
 
     /**
@@ -144,7 +129,13 @@ class DIC
      */
     public static function has($id)
     {
-        return isset(self::$cache[$id]);
+        if(false === isset(self::$values[$id])){
+            self::setValue($id);
+        }
+
+        return isset(self::$values[$id]);
+
+        return (isset(self::$values[$id])) ? true : self::setValue($id);
     }
 
     /**
@@ -152,37 +143,7 @@ class DIC
      */
     public static function keys()
     {
-        return array_keys(self::$cache);
-    }
-
-    /**
-     * Set an entry in the container.
-     *
-     * @param array $cachedMap
-     * @param mixed $content
-     *
-     * @return mixed|bool|null
-     */
-    private static function setInCache($cachedMap, $content)
-    {
-        // if is not a class set the entry value in DIC
-        if (false === isset($content['class'])) {
-            return self::getFromEnvOrDICParams($content);
-        }
-
-        // otherwise it's a class, so extract variables
-        extract($content);
-
-        $methodArgsToInject = self::getArgumentsToInject($cachedMap, isset($method_arguments) ? $method_arguments : null);
-        $classArgsToInject = self::getArgumentsToInject($cachedMap, isset($arguments) ? $arguments : null);
-
-        try {
-            return self::instantiateTheClass($class, $classArgsToInject, isset($method) ? $method : null, $methodArgsToInject);
-        } catch (\Error $error) {
-            return false;
-        } catch (\Exception $exception) {
-            return false;
-        }
+        return array_keys(self::$values);
     }
 
     /**
@@ -234,13 +195,13 @@ class DIC
      *
      * @return array
      */
-    private static function getArgumentsToInject(array $cachedMap = [], $providedArguments = null)
+    private static function getArgumentsToInject($providedArguments = null)
     {
         $returnArguments = [];
 
         if (null != $providedArguments) {
             foreach ($providedArguments as $argument) {
-                $returnArguments[] = self::getArgumentToInject($cachedMap, $argument);
+                $returnArguments[] = self::getArgumentToInject($argument);
             }
         }
 
@@ -253,11 +214,11 @@ class DIC
      *
      * @return mixed|string|null
      */
-    private static function getArgumentToInject(array $cachedMap = [], $argument)
+    private static function getArgumentToInject($argument)
     {
         $id = ltrim($argument, '@');
 
-        return (isset($cachedMap[$id])) ? $cachedMap[$id]['value'] : self::getFromEnvOrDICParams($argument);
+        return (isset(self::$cache[$id])) ? self::get($id) : self::getFromEnvOrDICParams($argument);
     }
 
     /**
