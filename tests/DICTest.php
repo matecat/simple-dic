@@ -13,6 +13,7 @@ use SimpleDIC\Dummy\Client;
 use SimpleDIC\Dummy\Controller;
 use SimpleDIC\Dummy\Database;
 use SimpleDIC\Dummy\Logger;
+use SimpleDIC\Dummy\NoSerialize;
 use SimpleDIC\Dummy\Router;
 use SimpleDIC\Exceptions\ParserException;
 
@@ -172,5 +173,17 @@ class DIC_Test extends TestCase
         $i2 = DIC::get('redis');
 
         $this->assertSame($i1, $i2);
+    }
+
+    /**
+     * @test
+     * @throws \Exception
+     */
+    public function init_with_not_serializable_class()
+    {
+        DIC::initFromFile(__DIR__ . '/../config/ini/no-serialize.ini');
+
+        $this->assertTrue(DIC::has('ser'));
+        $this->assertInstanceOf(NoSerialize::class, DIC::get('ser'));
     }
 }

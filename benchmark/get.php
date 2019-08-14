@@ -6,7 +6,7 @@ include __DIR__.'/../vendor/autoload.php';
 $config = __DIR__ . '/../config/ini/redis.ini';
 DIC::initFromFile($config);
 
-$max = 10000;
+$max = 4;
 
 $start = microtime(true);
 $memoryUsage = memory_get_usage();

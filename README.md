@@ -90,18 +90,19 @@ logger:
 
 ## Retrieve an entry
 
-In order to retrieve an entry (and its metadata if you need it) simple do this:
+In order to retrieve an entry use `get` method:
 
 ```php
 use SimpleDIC\DIC;
 
 $dependency = DIC::get('key');
-$metadata = DIC::getMetadata('key');
 ```
 
 Please note that the method returns:
 * `false` if the entry has a wrong configuration;
 * `NULL` if the entry does not exists.
+
+The entry is **LAXY LOADED** .
 
 ## Commands
 

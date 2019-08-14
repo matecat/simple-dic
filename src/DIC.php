@@ -22,6 +22,11 @@ class DIC
     private static $cacheDir;
 
     /**
+     * @var string
+     */
+    private static $sha;
+
+    /**
      * @param string $filename
      *
      * @throws Exceptions\ParserException
@@ -29,16 +34,18 @@ class DIC
     public static function initFromFile($filename)
     {
         self::$values = [];
-        $mapFile = self::getCacheDir(). DIRECTORY_SEPARATOR .sha1($filename).'.php';
+        self::$sha = sha1($filename);
 
-        if(false === file_exists($mapFile)){
+        $mapFile = self::getCacheDir(). DIRECTORY_SEPARATOR .self::$sha.'.php';
+
+        if (false === file_exists($mapFile)) {
             if (false === is_dir(self::getCacheDir())) {
-                if(false === mkdir(self::getCacheDir(), 0755, true)){
+                if (false === mkdir(self::getCacheDir(), 0755, true)) {
                     throw new \Exception(self::getCacheDir() . ' is not a writable directory.');
                 }
             }
 
-            if(false === file_put_contents($mapFile, '<?php return unserialize(\'' . serialize(Parser::parse($filename)) . '\');' . PHP_EOL)) {
+            if (false === file_put_contents($mapFile, '<?php return unserialize(\'' . serialize(Parser::parse($filename)) . '\');' . PHP_EOL)) {
                 throw new \Exception(' Can\'t write cache file.');
             }
         }
@@ -79,7 +86,11 @@ class DIC
      */
     public static function get($id)
     {
-        if(false === isset(self::$values[$id])){
+        if (isset($_SESSION[self::$sha][$id])) {
+            return $_SESSION[self::$sha][$id];
+        }
+
+        if (false === isset(self::$values[$id])) {
             self::setValue($id);
         }
 
@@ -100,7 +111,7 @@ class DIC
 
         // if is not a class set the entry value in DIC
         if (false === isset($content['class'])) {
-            self::$values[$id] = self::getFromEnvOrDICParams($content);
+            self::$values[$id] = $_SESSION[self::$sha][$id] = self::getFromEnvOrDICParams($content);
 
             return true;
         }
@@ -112,7 +123,7 @@ class DIC
         $classArgsToInject = self::getArgumentsToInject(isset($arguments) ? $arguments : null);
 
         try {
-            self::$values[$id] = self::instantiateTheClass($class, $classArgsToInject, isset($method) ? $method : null, $methodArgsToInject);
+            self::$values[$id] = $_SESSION[self::$sha][$id] = self::instantiateTheClass($class, $classArgsToInject, isset($method) ? $method : null, $methodArgsToInject);
 
             return true;
         } catch (\Error $error) {
@@ -129,7 +140,7 @@ class DIC
      */
     public static function has($id)
     {
-        if(false === isset(self::$values[$id])){
+        if (false === isset(self::$values[$id])) {
             self::setValue($id);
         }
 

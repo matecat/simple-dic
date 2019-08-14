@@ -42,11 +42,11 @@ class DICDebug extends Command
         asort($keys);
 
         $table = new Table($output);
-        $table->setHeaders(['#', 'Alias', 'Type', 'Creation time (ms)', 'Memory usage', 'Content']);
+        $table->setHeaders(['#', 'Alias', 'Content']);
 
         $i = 1;
         foreach ($keys as $key) {
-            $table->setRow($i, [$i, $key, DIC::getMetadata($key)['type'], DIC::getMetadata($key)['create_time'], DIC::getMetadata($key)['memory_usage'], $this->getValue($key)]);
+            $table->setRow($i, [$i, $key, $this->getValue($key)]);
             $i++;
         }
 
