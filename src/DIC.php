@@ -35,7 +35,7 @@ class DIC
     public static function initFromFile($filename)
     {
         self::$values = [];
-        self::$sha = sha1($filename);
+        self::$sha = sha1_file($filename);
 
         $mapFile = self::getCacheDir(). DIRECTORY_SEPARATOR .self::$sha.'.php';
 
