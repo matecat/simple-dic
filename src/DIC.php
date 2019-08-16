@@ -86,14 +86,17 @@ class DIC
      */
     public static function get($id)
     {
-        if (isset($_SESSION[self::$sha][$id])) {
-            return $_SESSION[self::$sha][$id];
+        // if apcu is enabled return from cache
+        if (self::isApcuEnabled() and apcu_exists(self::getApcuKey($id))) {
+            return apcu_fetch(self::getApcuKey($id));
         }
 
+        // otherwise set the value in memory if it is not present
         if (false === isset(self::$values[$id])) {
             self::setValue($id);
         }
 
+        // return from memory
         return self::$values[$id];
     }
 
@@ -111,7 +114,8 @@ class DIC
 
         // if is not a class set the entry value in DIC
         if (false === isset($content['class'])) {
-            self::$values[$id] = $_SESSION[self::$sha][$id] = self::getFromEnvOrDICParams($content);
+            self::$values[$id] = self::getFromEnvOrDICParams($content);
+            $_SESSION[self::$sha][$id] = self::$values[$id];
 
             return true;
         }
@@ -123,7 +127,11 @@ class DIC
         $classArgsToInject = self::getArgumentsToInject(isset($arguments) ? $arguments : null);
 
         try {
-            self::$values[$id] = $_SESSION[self::$sha][$id] = self::instantiateTheClass($class, $classArgsToInject, isset($method) ? $method : null, $methodArgsToInject);
+            self::$values[$id] = self::instantiateTheClass($class, $classArgsToInject, isset($method) ? $method : null, $methodArgsToInject);
+
+            if (self::isApcuEnabled()) {
+                apcu_store(self::getApcuKey($id), self::$values[$id]);
+            }
 
             return true;
         } catch (\Error $error) {
@@ -131,6 +139,24 @@ class DIC
         } catch (\Exception $exception) {
             return false;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    private static function isApcuEnabled()
+    {
+        return (extension_loaded('apc') && ini_get('apc.enabled'));
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return string
+     */
+    private static function getApcuKey($id)
+    {
+        return md5(self::$sha.'/'.$id);
     }
 
     /**
@@ -145,8 +171,6 @@ class DIC
         }
 
         return isset(self::$values[$id]);
-
-        return (isset(self::$values[$id])) ? true : self::setValue($id);
     }
 
     /**

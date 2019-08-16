@@ -1,4 +1,5 @@
 <?php
+
 use SimpleDIC\DIC;
 
 include __DIR__.'/../vendor/autoload.php';
@@ -6,12 +7,13 @@ include __DIR__.'/../vendor/autoload.php';
 $config = __DIR__ . '/../config/ini/redis.ini';
 DIC::initFromFile($config);
 
-$max = 4;
+$max = 3;
 
 $start = microtime(true);
 $memoryUsage = memory_get_usage();
 for ($i=0;$i<$max;$i++) {
     $redis = DIC::get('redis');
+    var_dump($redis);
 }
 
 $stringval = microtime(true) - $start;

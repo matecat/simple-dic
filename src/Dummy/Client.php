@@ -33,4 +33,9 @@ class Client
     {
         return $this->username;
     }
+
+    public function __sleep()
+    {
+        throw new \RuntimeException('This class cannot be serialized.');
+    }
 }
