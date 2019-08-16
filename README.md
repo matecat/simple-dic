@@ -106,7 +106,8 @@ Please note that the method returns:
 
 The entries are **lazy-loaded** when you invoke `get` method for the first time. 
 
-If you have [apcu](https://www.php.net/manual/en/book.apcu.php) enabled on your system, DIC will automatically cache the entry in APCU store. Please note that the **id in cache always refers to the sha1() of the provided init file**.
+If you have [apcu](https://www.php.net/manual/en/book.apcu.php) enabled on your system, DIC will automatically cache the entry in APCU store. Please note that the **id in cache is calculated by
+ the sha1sum of the provided init file**.
 
 ## Commands
 
