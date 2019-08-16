@@ -45,28 +45,28 @@ class DIC_Test extends TestCase
         DIC::initFromFile(__DIR__ . '/../config/yaml/config.yaml');
 
         // 1) simple entries
-        $this->assertTrue(DIC::has('dummy-key'));
-        $this->assertTrue(DIC::has('dummy-array'));
         $this->assertEquals(DIC::get('dummy-key'), 'dummy-value');
         $this->assertEquals(DIC::get('dummy-array'), [43243,2432,4324,445667]);
+        $this->assertTrue(DIC::has('dummy-key'));
+        $this->assertTrue(DIC::has('dummy-array'));
 
         // 2) simple class
-        $this->assertTrue(DIC::has('acme'));
         $this->assertInstanceOf(Acme::class, DIC::get('acme'));
+        $this->assertTrue(DIC::has('acme'));
 
         // 3) class with arguments
-        $this->assertTrue(DIC::has('acme-parser'));
         $this->assertInstanceOf(AcmeParser::class, DIC::get('acme-parser'));
+        $this->assertTrue(DIC::has('acme-parser'));
         $this->assertEquals('string', DIC::get('acme-parser')->parse());
 
         // 4) class with dependencies
-        $this->assertTrue(DIC::has('acme-repo'));
         $this->assertInstanceOf(AcmeRepo::class, DIC::get('acme-repo'));
+        $this->assertTrue(DIC::has('acme-repo'));
         $this->assertInstanceOf(Acme::class, DIC::get('acme-repo')->getAcme());
 
         // 5) class with method and method arguments
-        $this->assertTrue(DIC::has('acme-calculator'));
         $this->assertInstanceOf(AcmeCalculator::class, DIC::get('acme-calculator'));
+        $this->assertTrue(DIC::has('acme-calculator'));
         $this->assertEquals(5, DIC::get('acme-calculator')->calculate());
 
         $this->assertEquals(8, DIC::count());
@@ -110,26 +110,26 @@ class DIC_Test extends TestCase
         // INI
         $dic = DIC::initFromFile(__DIR__ . '/../config/ini/logger.ini');
 
-        $this->assertTrue(DIC::has('logger'));
         $this->assertInstanceOf(Logger::class, DIC::get('logger'));
+        $this->assertTrue(DIC::has('logger'));
 
         // JSON
         $dic = DIC::initFromFile(__DIR__ . '/../config/json/controller.json');
 
-        $this->assertTrue(DIC::has('controller'));
         $this->assertInstanceOf(Controller::class, DIC::get('controller'));
+        $this->assertTrue(DIC::has('controller'));
 
         // XML
         $dic = DIC::initFromFile(__DIR__ . '/../config/xml/router.xml');
 
-        $this->assertTrue(DIC::has('router'));
         $this->assertInstanceOf(Router::class, DIC::get('router'));
+        $this->assertTrue(DIC::has('router'));
 
         // YAML
         $dic = DIC::initFromFile(__DIR__ . '/../config/yaml/database.yaml');
 
-        $this->assertTrue(DIC::has('db'));
         $this->assertInstanceOf(Database::class, DIC::get('db'));
+        $this->assertTrue(DIC::has('db'));
     }
 
     /**
@@ -140,8 +140,8 @@ class DIC_Test extends TestCase
         DICParams::initFromFile(__DIR__.'/../config/ini/parameters.ini');
         $dic = DIC::initFromFile(__DIR__ . '/../config/ini/client.ini');
 
-        $this->assertTrue(DIC::has('client'));
         $this->assertInstanceOf(Client::class, DIC::get('client'));
+        $this->assertTrue(DIC::has('client'));
         $this->assertEquals('mauretto78', DIC::get('client')->getUsername());
     }
 
@@ -152,8 +152,8 @@ class DIC_Test extends TestCase
     {
         DIC::initFromFile(__DIR__ . '/../config/ini/logger.ini');
 
-        $this->assertTrue(DIC::has('logger'));
         $this->assertInstanceOf(Logger::class, DIC::get('logger'));
+        $this->assertTrue(DIC::has('logger'));
         $this->assertEquals('bar', DIC::get('logger')->getFoo());
     }
 
@@ -166,8 +166,8 @@ class DIC_Test extends TestCase
         DIC::setCacheDir(__DIR__.'/../_cache_custom');
         DIC::initFromFile(__DIR__ . '/../config/ini/redis.ini');
 
-        $this->assertTrue(DIC::has('redis'));
         $this->assertInstanceOf(Client::class, DIC::get('redis'));
+        $this->assertTrue(DIC::has('redis'));
 
         $i1 = DIC::get('redis');
         $i2 = DIC::get('redis');
@@ -183,7 +183,7 @@ class DIC_Test extends TestCase
     {
         DIC::initFromFile(__DIR__ . '/../config/ini/no-serialize.ini');
 
-        $this->assertTrue(DIC::has('ser'));
         $this->assertInstanceOf(NoSerialize::class, DIC::get('ser'));
+        $this->assertTrue(DIC::has('ser'));
     }
 }

@@ -29,6 +29,7 @@ class DIC
     /**
      * @param string $filename
      *
+     * @return DIC
      * @throws Exceptions\ParserException
      */
     public static function initFromFile($filename)
@@ -51,6 +52,8 @@ class DIC
         }
 
         self::$cache = include($mapFile);
+
+        return new self;
     }
 
     /**
@@ -166,8 +169,8 @@ class DIC
      */
     public static function has($id)
     {
-        if (false === isset(self::$values[$id])) {
-            self::setValue($id);
+        if (self::isApcuEnabled() and apcu_exists(self::getApcuKey($id))) {
+            return true;
         }
 
         return isset(self::$values[$id]);
@@ -178,7 +181,7 @@ class DIC
      */
     public static function keys()
     {
-        return array_keys(self::$values);
+        return array_keys(self::$cache);
     }
 
     /**
