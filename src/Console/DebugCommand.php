@@ -12,32 +12,26 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class DebugCommand extends Command
 {
-    /**
-     * DebugCommand constructor.
-     *
-     * @param string $filename
-     * @param null $name
-     *
-     * @throws \SimpleDIC\Exceptions\ParserException
-     */
-    public function __construct($filename, $name = null)
-    {
-        parent::__construct($name);
-
-        DIC::initFromFile($filename);
-    }
-
     protected function configure()
     {
         $this
                 ->setName('dic:debug')
                 ->setDescription('Dumps the entry list in the DIC.')
                 ->setHelp('This command shows you to complete entry list in the DIC from a valid config array.')
+                ->addArgument('config_file', InputArgument::REQUIRED)
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $configFile = $input->getArgument('config_file');
+
+        if (false === file_exists($configFile)) {
+            throw new \InvalidArgumentException($configFile . ' is not a valid file');
+        }
+
+        DIC::initFromFile($configFile);
+
         $keys = DIC::keys();
         asort($keys);
 

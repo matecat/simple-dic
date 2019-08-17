@@ -131,11 +131,8 @@ use Symfony\Component\Yaml\Yaml;
 // create symfony console app
 $app = new \Symfony\Component\Console\Application('Simple DIC', 'console tool');
 
-// config
-$configFile = __DIR__.'/../config/yaml/config.yaml';
-
 // add commands here
-$app->add(new \SimpleDIC\Console\DICDebug($configFile));
+$app->add(new \SimpleDIC\Console\DebugCommand());
 $app->add(new \SimpleDIC\Console\CacheDestroyCommand());
 $app->run();
 ```
