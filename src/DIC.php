@@ -38,27 +38,25 @@ class DIC
         self::$values = [];
         self::$sha = sha1_file($filename);
 
-        $mapFile = self::getCacheDir(). DIRECTORY_SEPARATOR .self::$sha.'.php';
+        $cacheFile = self::getCacheDir(). DIRECTORY_SEPARATOR .self::$sha.'.php';
 
-        if (false === file_exists($mapFile)) {
-            if (false === is_dir(self::getCacheDir())) {
-                if (false === mkdir(self::getCacheDir(), 0755, true)) {
-                    throw new \Exception(self::getCacheDir() . ' is not a writable directory.');
-                }
+        if (false === file_exists($cacheFile)) {
+            if (false === is_dir(self::getCacheDir()) and false === mkdir(self::getCacheDir(), 0755, true)) {
+                throw new \Exception(self::getCacheDir() . ' is not a writable directory.');
             }
 
-            if (false === file_put_contents($mapFile, '<?php return unserialize(\'' . serialize(Parser::parse($filename)) . '\');' . PHP_EOL)) {
+            if (false === file_put_contents($cacheFile, '<?php return unserialize(\'' . serialize(Parser::parse($filename)) . '\');' . PHP_EOL)) {
                 throw new \Exception(' Can\'t write cache file.');
             }
         }
 
-        self::$cache = include($mapFile);
+        self::$cache = include($cacheFile);
 
         return new self;
     }
 
     /**
-     * @param $dir
+     * @param string $dir
      *
      * @return mixed
      */
@@ -86,10 +84,41 @@ class DIC
         return count(self::$values);
     }
 
+    /**
+     * @throws ConfigException
+     */
     private static function checkForCache()
     {
         if(empty(self::$cache)){
             throw new ConfigException('No config file was provided. You MUST use before initFromFile() method.');
+        }
+    }
+
+    /**
+     * @param string $cacheDir
+     */
+    public static function destroyCacheDir($cacheDir)
+    {
+        if (false === is_dir($cacheDir)) {
+            throw new \InvalidArgumentException($cacheDir . ' is not a valid dir');
+        }
+
+        foreach (scandir($cacheDir) as $file) {
+            if (!in_array($file, ['.', '..'])) {
+
+                // destroy apcu
+                if (self::isApcuEnabled()) {
+                    $filePath = $cacheDir . DIRECTORY_SEPARATOR . $file;
+                    $array = include($filePath);
+
+                    foreach ($array as $id => $entry) {
+                        apcu_delete(self::getApcuKey($id));
+                    }
+                }
+
+                // delete file
+                unlink($filePath);
+            }
         }
     }
 
@@ -103,7 +132,7 @@ class DIC
     {
         self::checkForCache();
 
-        // if apcu is enabled return from cache
+        // if APCU is enabled return the entry from APCU store
         if (self::isApcuEnabled() and apcu_exists(self::getApcuKey($id))) {
             return apcu_fetch(self::getApcuKey($id));
         }
@@ -113,17 +142,17 @@ class DIC
             self::setValue($id);
         }
 
-        // return from memory
+        // return the entry from memory
         return self::$values[$id];
     }
 
     /**
      * Set an entry in the container.
      *
-     * @param array $cachedMap
-     * @param mixed $content
+     * @param string $id
      *
      * @return bool
+     * @throws ConfigException
      */
     private static function setValue($id)
     {
@@ -261,12 +290,10 @@ class DIC
     }
 
     /**
-     * Get the arguments to inject into the class to instantiate within DIC.
-     *
-     * @param array $cachedMap
      * @param null $providedArguments
      *
      * @return array
+     * @throws ConfigException
      */
     private static function getArgumentsToInject($providedArguments = null)
     {
@@ -282,10 +309,10 @@ class DIC
     }
 
     /**
-     * @param array $cachedMap
      * @param string $argument
      *
      * @return mixed|string|null
+     * @throws ConfigException
      */
     private static function getArgumentToInject($argument)
     {
