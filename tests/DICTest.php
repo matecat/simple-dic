@@ -15,6 +15,7 @@ use SimpleDIC\Dummy\Database;
 use SimpleDIC\Dummy\Logger;
 use SimpleDIC\Dummy\NoSerialize;
 use SimpleDIC\Dummy\Router;
+use SimpleDIC\Exceptions\ConfigException;
 use SimpleDIC\Exceptions\ParserException;
 
 class DIC_Test extends TestCase
@@ -23,6 +24,40 @@ class DIC_Test extends TestCase
     {
         parent::__construct($name, $data, $dataName);
         putenv("FOO=bar");
+    }
+
+    /**
+     * @test
+     */
+    public function throws_ConfigException_if_no_config_was_provided()
+    {
+        try {
+            DIC::count();
+        } catch (\Exception $e){
+            $this->assertInstanceOf(ConfigException::class, $e);
+            $this->assertEquals($e->getMessage(), 'No config file was provided. You MUST use before initFromFile() method.');
+        }
+
+        try {
+            DIC::get('acme');
+        } catch (\Exception $e){
+            $this->assertInstanceOf(ConfigException::class, $e);
+            $this->assertEquals($e->getMessage(), 'No config file was provided. You MUST use before initFromFile() method.');
+        }
+
+        try {
+            DIC::has('acme');
+        } catch (\Exception $e){
+            $this->assertInstanceOf(ConfigException::class, $e);
+            $this->assertEquals($e->getMessage(), 'No config file was provided. You MUST use before initFromFile() method.');
+        }
+
+        try {
+            DIC::keys();
+        } catch (\Exception $e){
+            $this->assertInstanceOf(ConfigException::class, $e);
+            $this->assertEquals($e->getMessage(), 'No config file was provided. You MUST use before initFromFile() method.');
+        }
     }
 
     /**

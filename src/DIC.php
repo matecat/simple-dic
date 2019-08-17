@@ -2,6 +2,7 @@
 
 namespace SimpleDIC;
 
+use SimpleDIC\Exceptions\ConfigException;
 use SimpleDIC\Parser\Parser;
 
 class DIC
@@ -76,19 +77,32 @@ class DIC
 
     /**
      * @return int
+     * @throws ConfigException
      */
     public static function count()
     {
+        self::checkForCache();
+
         return count(self::$values);
+    }
+
+    private static function checkForCache()
+    {
+        if(empty(self::$cache)){
+            throw new ConfigException('No config file was provided. You MUST use before initFromFile() method.');
+        }
     }
 
     /**
      * @param string $id
      *
-     * @return mixed|null
+     * @return mixed
+     * @throws ConfigException
      */
     public static function get($id)
     {
+        self::checkForCache();
+
         // if apcu is enabled return from cache
         if (self::isApcuEnabled() and apcu_exists(self::getApcuKey($id))) {
             return apcu_fetch(self::getApcuKey($id));
@@ -181,9 +195,12 @@ class DIC
      * @param string $id
      *
      * @return bool
+     * @throws ConfigException
      */
     public static function has($id)
     {
+        self::checkForCache();
+
         if (self::isApcuEnabled() and apcu_exists(self::getApcuKey($id))) {
             return true;
         }
@@ -193,9 +210,12 @@ class DIC
 
     /**
      * @return array
+     * @throws ConfigException
      */
     public static function keys()
     {
+        self::checkForCache();
+
         return array_keys(self::$cache);
     }
 
