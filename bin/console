@@ -12,5 +12,6 @@ $app = new \Symfony\Component\Console\Application('Simple DIC', 'console tool');
 $configFile = __DIR__.'/../config/yaml/config.yaml';
 
 // add commands here
-$app->add(new \SimpleDIC\Console\DICDebug($configFile));
+$app->add(new \SimpleDIC\Console\DebugCommand($configFile));
+$app->add(new \SimpleDIC\Console\CacheDestroyCommand());
 $app->run();

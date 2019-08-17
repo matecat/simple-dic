@@ -118,7 +118,10 @@ class DIC
         // if is not a class set the entry value in DIC
         if (false === isset($content['class'])) {
             self::$values[$id] = self::getFromEnvOrDICParams($content);
-            $_SESSION[self::$sha][$id] = self::$values[$id];
+
+            if (self::isApcuEnabled()) {
+                self::tryToStoreInApcu($id);
+            }
 
             return true;
         }
@@ -133,7 +136,7 @@ class DIC
             self::$values[$id] = self::instantiateTheClass($class, $classArgsToInject, isset($method) ? $method : null, $methodArgsToInject);
 
             if (self::isApcuEnabled()) {
-                apcu_store(self::getApcuKey($id), self::$values[$id]);
+                self::tryToStoreInApcu($id);
             }
 
             return true;
@@ -159,7 +162,19 @@ class DIC
      */
     private static function getApcuKey($id)
     {
-        return md5(self::$sha.'/'.$id);
+        return md5(self::$sha . DIRECTORY_SEPARATOR . $id);
+    }
+
+    /**
+     * @param string $id
+     */
+    private static function tryToStoreInApcu($id)
+    {
+        try {
+            apcu_add(self::getApcuKey($id), self::$values[$id]);
+        } catch (\Exception $e) {
+            // nothing to do, continue
+        }
     }
 
     /**

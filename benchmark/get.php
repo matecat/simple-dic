@@ -2,9 +2,13 @@
 
 use SimpleDIC\DIC;
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 include __DIR__.'/../vendor/autoload.php';
 
-$config = __DIR__ . '/../config/ini/redis.ini';
+$config = __DIR__ . '/../config/yaml/config.yaml';
 DIC::initFromFile($config);
 
 $max = 100000;
@@ -12,7 +16,7 @@ $max = 100000;
 $start = microtime(true);
 $memoryUsage = memory_get_usage();
 for ($i=0;$i<$max;$i++) {
-    $redis = DIC::get('redis');
+    DIC::get('acme-calculator');
 }
 
 $stringval = microtime(true) - $start;

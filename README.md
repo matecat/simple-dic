@@ -106,13 +106,15 @@ Please note that the method returns:
 
 The entries are **lazy-loaded** when you invoke `get` method for the first time. 
 
-If you have [apcu](https://www.php.net/manual/en/book.apcu.php) enabled on your system, DIC will automatically cache the entry in APCU store. Please note that the **id in cache is calculated by
- the sha1sum of the provided init file**.
+If you have [apcu](https://www.php.net/manual/en/book.apcu.php) enabled on your system, DIC will automatically try to cache the entry in APCU store. 
 
+Please note that the **cache id is calculated by the sha1sum of the provided init file**.
+ 
 ## Commands
 
 If you have an application which uses [Symfony Console](https://github.com/symfony/console), you have some commands available:
 
+*  ```dic:cache-destroy```       Destroy the cache created by DIC.
 *  ```dic:debug```     Dumps the entry list in the DIC.
 
 You can register the commands in your app, consider this example:
@@ -134,6 +136,7 @@ $configFile = __DIR__.'/../config/yaml/config.yaml';
 
 // add commands here
 $app->add(new \SimpleDIC\Console\DICDebug($configFile));
+$app->add(new \SimpleDIC\Console\CacheDestroyCommand());
 $app->run();
 ```
 

@@ -10,10 +10,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class DICDebug extends Command
+class DebugCommand extends Command
 {
     /**
-     * DICDebug constructor.
+     * DebugCommand constructor.
      *
      * @param string $filename
      * @param null $name
