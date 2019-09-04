@@ -1,12 +1,12 @@
 {
-  "name": "mauretto78/simple-dic",
+  "name": "matecat/simple-dic",
   "type": "library",
   "description": "Simple DIC Client",
-  "keywords": ["DIC", "Pimple", "Dependency Injection", "php"],
+  "keywords": ["DIC", "Dependency Injection", "php"],
   "homepage": "https://github.com/mauretto78/simple-dic",
   "license": "MIT",
   "support": {
-    "issues": "https://github.com/mauretto78/simple-dic/issues"
+    "issues": "https://github.com/matecat/simple-dic/issues"
   },
   "authors": [
     {
