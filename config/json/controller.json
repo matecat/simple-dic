@@ -1,6 +1,6 @@
 {
   "controller":  {
-    "class": "SimpleDIC\\Dummy\\Controller",
+    "class": "Matecat\\SimpleDIC\\Dummy\\Controller",
     "arguments": ["Dummy-Controller"]
   }
 }

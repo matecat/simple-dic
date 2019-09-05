@@ -1,8 +1,8 @@
 <?php
 
-namespace SimpleDIC\Console;
+namespace Matecat\SimpleDIC\Console;
 
-use SimpleDIC\DIC;
+use Matecat\SimpleDIC\DIC;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;

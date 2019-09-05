@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleDIC\Dummy;
+namespace Matecat\SimpleDIC\Dummy;
 
 class AcmeCalculator
 {

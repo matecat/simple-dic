@@ -1,3 +1,3 @@
 db:
-  class: SimpleDIC\Dummy\Database
+  class: Matecat\SimpleDIC\Dummy\Database
   arguments: ['test', 'root', '@password']

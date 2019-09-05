@@ -1,9 +1,9 @@
 <?php
 
-namespace SimpleDIC\Tests;
+namespace Matecat\SimpleDIC\Tests;
 
 use PHPUnit\Framework\TestCase;
-use SimpleDIC\DICParams;
+use Matecat\SimpleDIC\DICParams;
 
 class DICParamsTest extends TestCase
 {

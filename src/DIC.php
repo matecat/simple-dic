@@ -1,9 +1,9 @@
 <?php
 
-namespace SimpleDIC;
+namespace Matecat\SimpleDIC;
 
-use SimpleDIC\Exceptions\ConfigException;
-use SimpleDIC\Parser\Parser;
+use Matecat\SimpleDIC\Exceptions\ConfigException;
+use Matecat\SimpleDIC\Parser\Parser;
 
 class DIC
 {

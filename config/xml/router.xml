@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dependencies>
     <router>
-        <class>SimpleDIC\Dummy\Router</class>
+        <class>Matecat\SimpleDIC\Dummy\Router</class>
         <arguments>Some dummy stuff</arguments>
         <arguments>Router</arguments>
     </router>

@@ -1,8 +1,8 @@
 <?php
 
-namespace SimpleDIC\Parser;
+namespace Matecat\SimpleDIC\Parser;
 
-use SimpleDIC\Exceptions\ParserException;
+use Matecat\SimpleDIC\Exceptions\ParserException;
 
 class Parser
 {

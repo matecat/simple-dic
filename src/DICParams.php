@@ -1,8 +1,8 @@
 <?php
 
-namespace SimpleDIC;
+namespace Matecat\SimpleDIC;
 
-use SimpleDIC\Parser\Parser;
+use Matecat\SimpleDIC\Parser\Parser;
 
 class DICParams
 {

@@ -1,8 +1,8 @@
 acme-calculator:
-  class: SimpleDIC\Dummy\AcmeCalculator
+  class: Matecat\SimpleDIC\Dummy\AcmeCalculator
   method: init
 acme-repo:
-  class: SimpleDIC\Dummy\AcmeRepo
+  class: Matecat\SimpleDIC\Dummy\AcmeRepo
   arguments: ['@acme']
 not-existing:
-  class: SimpleDIC\Dummy\NotExistintClass
+  class: Matecat\SimpleDIC\Dummy\NotExistintClass

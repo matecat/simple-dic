@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleDIC\Parser;
+namespace Matecat\SimpleDIC\Parser;
 
 class JsonParser implements ParserInterface
 {

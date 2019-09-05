@@ -1,9 +1,9 @@
 # Simple DIC
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5bee3c5a5e774e5aba1fcf9f622f08d2)](https://www.codacy.com/app/mauretto78_2/simple-dic?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mauretto78/simple-dic&amp;utm_campaign=Badge_Grade)
-[![license](https://img.shields.io/github/license/mauretto78/simple-dic.svg)]()
-[![Packagist](https://img.shields.io/packagist/v/mauretto78/simple-dic.svg)]()
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mauretto78/simple-dic/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mauretto78/simple-dic/?branch=master)
+[![license](https://img.shields.io/github/license/matecat/simple-dic.svg)]()
+[![Packagist](https://img.shields.io/packagist/v/matecat/simple-dic.svg)]()
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/matecat/simple-dic/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mauretto78/simple-dic/?branch=master)
 
 **Simple DIC** is a simple Dependency Injection Container(DIC).
 
@@ -19,16 +19,16 @@ dummy-array: [43243,2432,4324,445667]
 three: 3
 two: 2
 acme:
-  class: SimpleDIC\Dummy\Acme
+  class: Matecat\SimpleDIC\Dummy\Acme
 acme-calculator:
-  class: SimpleDIC\Dummy\AcmeCalculator
+  class: Matecat\SimpleDIC\Dummy\AcmeCalculator
   method: init
   method_arguments: ['@three', '@two']
 acme-parser:
-  class: SimpleDIC\Dummy\AcmeParser
+  class: Matecat\SimpleDIC\Dummy\AcmeParser
   arguments: ['string']
 acme-repo:
-  class: SimpleDIC\Dummy\AcmeRepo
+  class: Matecat\SimpleDIC\Dummy\AcmeRepo
   arguments: ['@acme']
 ```
 
@@ -65,7 +65,7 @@ your_secret_password: 'YOUR_SECRET_PASS'
 You can setup `DICParams` class now:
 
 ```php
-use SimpleDIC\DICParams;
+use Matecat\SimpleDIC\DICParams;
 
 DICParams::initFromFile('your_params_file.yaml');
 ```
@@ -84,7 +84,7 @@ To use your environment variable, simply follow the `%env(xxxx)%` synthax, consi
 
 ```yaml
 logger:
-    class: 'SimpleDIC\Dummy\Logger'
+    class: 'Matecat\SimpleDIC\Dummy\Logger'
     arguments: ['%env(FOO)%']
 ```
 
@@ -93,7 +93,7 @@ logger:
 In order to retrieve an entry use `get` method:
 
 ```php
-use SimpleDIC\DIC;
+use Matecat\SimpleDIC\DIC;
 
 $dependency = DIC::get('key');
 ```
@@ -104,17 +104,14 @@ Please note that the method returns:
 
 ## Lazy loading and automatic caching
 
-The entries are **lazy-loaded** when you invoke `get` method for the first time. 
+The entries are **lazy-loaded** when you invoke `get` or `has` method for the first time. 
 
-If you have [apcu](https://www.php.net/manual/en/book.apcu.php) enabled on your system, DIC will automatically try to cache the entry in APCU store. 
+If you have apcu enabled on your system, DIC will automatically cache the entry in APCU store. Please note that the **id in cache always refers to the sha1() of the init file**.
 
-Please note that the **cache id is calculated by the sha1sum of the provided init file**.
- 
 ## Commands
 
 If you have an application which uses [Symfony Console](https://github.com/symfony/console), you have some commands available:
 
-*  ```dic:cache-destroy```       Destroy the cache created by DIC.
 *  ```dic:debug```     Dumps the entry list in the DIC.
 
 You can register the commands in your app, consider this example:
@@ -131,9 +128,11 @@ use Symfony\Component\Yaml\Yaml;
 // create symfony console app
 $app = new \Symfony\Component\Console\Application('Simple DIC', 'console tool');
 
+// config
+$configFile = __DIR__.'/../config/yaml/config.yaml';
+
 // add commands here
-$app->add(new \SimpleDIC\Console\DebugCommand());
-$app->add(new \SimpleDIC\Console\CacheDestroyCommand());
+$app->add(new \Matecat\SimpleDIC\Console\DICDebug($configFile));
 $app->run();
 ```
 

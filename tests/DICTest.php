@@ -1,22 +1,22 @@
 <?php
 
-namespace SimpleDIC\Tests;
+namespace Matecat\SimpleDIC\Tests;
 
 use PHPUnit\Framework\TestCase;
-use SimpleDIC\DIC;
-use SimpleDIC\DICParams;
-use SimpleDIC\Dummy\Acme;
-use SimpleDIC\Dummy\AcmeCalculator;
-use SimpleDIC\Dummy\AcmeParser;
-use SimpleDIC\Dummy\AcmeRepo;
-use SimpleDIC\Dummy\Client;
-use SimpleDIC\Dummy\Controller;
-use SimpleDIC\Dummy\Database;
-use SimpleDIC\Dummy\Logger;
-use SimpleDIC\Dummy\NoSerialize;
-use SimpleDIC\Dummy\Router;
-use SimpleDIC\Exceptions\ConfigException;
-use SimpleDIC\Exceptions\ParserException;
+use Matecat\SimpleDIC\DIC;
+use Matecat\SimpleDIC\DICParams;
+use Matecat\SimpleDIC\Dummy\Acme;
+use Matecat\SimpleDIC\Dummy\AcmeCalculator;
+use Matecat\SimpleDIC\Dummy\AcmeParser;
+use Matecat\SimpleDIC\Dummy\AcmeRepo;
+use Matecat\SimpleDIC\Dummy\Client;
+use Matecat\SimpleDIC\Dummy\Controller;
+use Matecat\SimpleDIC\Dummy\Database;
+use Matecat\SimpleDIC\Dummy\Logger;
+use Matecat\SimpleDIC\Dummy\NoSerialize;
+use Matecat\SimpleDIC\Dummy\Router;
+use Matecat\SimpleDIC\Exceptions\ConfigException;
+use Matecat\SimpleDIC\Exceptions\ParserException;
 
 class DIC_Test extends TestCase
 {

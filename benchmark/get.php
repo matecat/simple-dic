@@ -1,6 +1,6 @@
 <?php
 
-use SimpleDIC\DIC;
+use Matecat\SimpleDIC\DIC;
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);

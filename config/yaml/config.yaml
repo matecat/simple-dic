@@ -3,15 +3,15 @@ dummy-array: [43243,2432,4324,445667]
 three: 3
 two: 2
 acme:
-  class: SimpleDIC\Dummy\Acme
+  class: Matecat\SimpleDIC\Dummy\Acme
 acme-calculator:
-  class: SimpleDIC\Dummy\AcmeCalculator
+  class: Matecat\SimpleDIC\Dummy\AcmeCalculator
   arguments: ['@three', '@two']
   method: init
   method_arguments: ['@three', '@two']
 acme-parser:
-  class: SimpleDIC\Dummy\AcmeParser
+  class: Matecat\SimpleDIC\Dummy\AcmeParser
   arguments: ['string']
 acme-repo:
-  class: SimpleDIC\Dummy\AcmeRepo
+  class: Matecat\SimpleDIC\Dummy\AcmeRepo
   arguments: ['@acme']

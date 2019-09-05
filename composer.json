@@ -3,7 +3,7 @@
   "type": "library",
   "description": "Simple DIC Client",
   "keywords": ["DIC", "Dependency Injection", "php"],
-  "homepage": "https://github.com/mauretto78/simple-dic",
+  "homepage": "https://github.com/matecat/simple-dic",
   "license": "MIT",
   "support": {
     "issues": "https://github.com/matecat/simple-dic/issues"
@@ -17,11 +17,11 @@
   ],
   "autoload": {
     "psr-4": {
-      "SimpleDIC\\": "src/"
+      "Matecat\\SimpleDIC\\": "src/"
     }
   },
   "autoload-dev": {
-    "psr-4": { "SimpleDIC\\Tests\\": "tests/" }
+    "psr-4": { "Matecat\\SimpleDIC\\Tests\\": "tests/" }
   },
   "require": {
     "php": ">=5.5"
